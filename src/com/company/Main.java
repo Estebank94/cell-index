@@ -37,9 +37,6 @@ public class Main {
         return particles;
     }
 
-    public static Double calculateBorderDistance(Particle p1, Particle p2) {
-        return Math.sqrt(Math.pow(p2.getPosition().getX() - p1.getPosition().getX(), 2) - Math.pow(p2.getPosition().getY() - p1.getPosition().getY(), 2)) - p1.getRadius();
-    }
 
     public static void addNeighbours(Cell c1, Cell c2, Double rc) {
         if(!c2.getChecked()) {

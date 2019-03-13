@@ -1,65 +1,35 @@
 package com.company;
 
-import java.util.List;
+import java.util.*;
+
 
 /**
  * Created by estebankramer on 12/03/2019.
  */
 public class Board {
-    private Double L;
-    private Integer M;
-    private Cell[][] board;
+    private Double l;
+    private Integer m;
+    private Double rc;
+    private Double cellSize;
+    private HashMap<Point, Set<Particle>> board;
+    private Boolean periodic;
 
-    public Board(Double l, Integer m, List<Particle> particles) {
-        L = l;
-        M = m;
-        board = setParticles(m, l, particles);
-    }
+    public Board(Double l, Integer m, Double rc, Set<Particle> particles, boolean periodic) {
+        this.l = l;
+        this.m = m;
+        this.rc = rc;
+        this.cellSize = l/m;
+        this.board = new HashMap<>();
+        this.periodic = periodic;
 
-    public Double getL() {
-        return L;
-    }
-
-    public void setL(Double l) {
-        L = l;
-    }
-
-    public Integer getM() {
-        return M;
-    }
-
-    public void setM(Integer m) {
-        M = m;
-    }
-
-    public Cell[][] getBoard() {
-        return board;
-    }
-
-    public void setBoard(Cell[][] board) {
-        this.board = board;
-    }
-
-    public Cell[][] setParticles(Integer m, Double l, List<Particle> particles) {
-        Cell[][] board = new Cell[m][];
-        Double cellLength = l / m;
-
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < m; j++) {
-                for (Particle particle : particles) {
-                    double x = particle.getPosition().getX();
-                    double y = particle.getPosition().getY();
-                    if (x >= i * cellLength && x <= i * cellLength + cellLength &&
-                            y >= j * cellLength && y <= j * cellLength + cellLength) {
-                        board[i][j].getParticles().add(particle);
-                        particles.remove(particle);
-                    }
-                }
+        for(int i = 0; i < m ; i++)
+            for(int j = 0; j < m; j++) {
+                board.put(new Point(i * 1.0,j * 1.0), new HashSet<>());
             }
-        }
 
-        return board;
     }
+
+    public Point
 
 
 }
