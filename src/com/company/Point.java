@@ -4,27 +4,27 @@ package com.company;
  * Created by estebankramer on 12/03/2019.
  */
 public class Point {
-    Double X;
-    Double Y;
+    double x;
+    double y;
 
-    public Point(Double x, Double y) {
-        X = x;
-        Y = y;
+    public Point(double x, double y) {
+        this.x = x;
+        this.y = y;
     }
 
-    public Double getX() {
-        return X;
+    public double getX() {
+        return x;
     }
 
-    public void setX(Double x) {
-        X = x;
+    public void setX(double x) {
+        this.x = x;
     }
 
-    public Double getY() {
-        return Y;
+    public double getY() {
+        return y;
     }
 
-    public void setY(Double y) {
-        Y = y;
+    public void setY(double y) {
+        this.y = y;
     }
 }

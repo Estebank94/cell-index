@@ -8,15 +8,15 @@ import java.util.Set;
  */
 
 public class Particle {
-    private Integer id;
-    private Double radius;
+    private int id;
+    private double radius;
     private Point position;
     private Set<Particle> neighbours;
-    private Double velocity;
-    private Double angle;
+    private double velocity;
+    private double angle;
     private Property<String> property;
 
-    public Particle(Integer id, Double radius, Point position, Double velocity, Double angle, Property<String> property) {
+    public Particle(int id, double radius, Point position, double velocity, double angle, Property<String> property) {
         this.id = id;
         this.radius = radius;
         this.position = position;
@@ -26,11 +26,19 @@ public class Particle {
         this.property = property;
     }
 
-    public Double getRadius() {
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public double getRadius() {
         return radius;
     }
 
-    public void setRadius(Double radius) {
+    public void setRadius(double radius) {
         this.radius = radius;
     }
 
@@ -50,27 +58,19 @@ public class Particle {
         this.neighbours = neighbours;
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Double getVelocity() {
+    public double getVelocity() {
         return velocity;
     }
 
-    public void setVelocity(Double velocity) {
+    public void setVelocity(double velocity) {
         this.velocity = velocity;
     }
 
-    public Double getAngle() {
+    public double getAngle() {
         return angle;
     }
 
-    public void setAngle(Double angle) {
+    public void setAngle(double angle) {
         this.angle = angle;
     }
 
@@ -83,7 +83,7 @@ public class Particle {
     }
 
     public static Double calculateBorderDistance(Particle p1, Particle p2) {
-        return Math.sqrt(Math.pow(p2.getPosition().getX() - p1.getPosition().getX(), 2) - Math.pow(p2.getPosition().getY() - p1.getPosition().getY(), 2)) - p1.getRadius();
+        return Math.sqrt(Math.pow(p2.getPosition().getX() - p1.getPosition().getX(), 2) - Math.pow(p2.getPosition().getY() - p1.getPosition().getY(), 2)) - p1.getRadius() * 2;
     }
 
     @Override
