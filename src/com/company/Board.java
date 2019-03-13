@@ -3,9 +3,6 @@ package com.company;
 import java.util.*;
 
 
-/**
- * Created by estebankramer on 12/03/2019.
- */
 public class Board {
     private double l;
     private int m;
@@ -28,9 +25,11 @@ public class Board {
             }
     }
 
+
     public Point getCellPosition(Point position) {
         return new Point( (int) position.getX()/cellSize, (int) position.getY()/cellSize);
     }
+
 
     public Set<Particle> getParticlesInCell(int x, int y) {
         if(x < 0) {
@@ -63,7 +62,6 @@ public class Board {
         return board.get(new Point(x,y));
     }
 
-
     private Set<Particle> getSurroundingParticles(Point cell) {
         Set<Particle> surroundingParticles = new HashSet<>();
         surroundingParticles.addAll(getParticlesInCell((int) cell.getX(), (int) cell.getY()));
@@ -95,19 +93,24 @@ public class Board {
             return false;
         }
 
-//        falta caso periodic
+        /*TODO: falta caso periodic*/
         return false;
     }
 
-    private Map<Particle, Set<Particle>> getAllCellNeighbours(Point cell) {
+    /* me devuelve todas las particulas que cumplen con el radio de acción y estan en las celdas vecinas*/
+    public Map<Particle, Set<Particle>> getAllCellNeighbours(Point cell) {
+        /*me va a dar todas las particulas de una cell determianda*/
         Set<Particle> cellParticles = board.get(cell);
-        Set<Particle> surroundingPartciles = getSurroundingParticles(cell);
+        Set<Particle> surroundingParticles = getSurroundingParticles(cell);
 
         Set<Particle> checkedParticles = new HashSet<>();
         Map<Particle, Set<Particle>> allCellNeighbours = new HashMap<>();
 
         for(Particle p : cellParticles) {
-            Set<Particle> particleNeighbours = getParticleNeighbours(p, surroundingPartciles, checkedParticles);
+            /*aca ya le voy a estar "adjuntando" a la particula las particulas vecinas que cumplan
+            con el radio de accion
+             */
+            Set<Particle> particleNeighbours = getParticleNeighbours(p, surroundingParticles, checkedParticles);
             checkedParticles.add(p);
             allCellNeighbours.put(p, particleNeighbours);
         }

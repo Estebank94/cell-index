@@ -3,9 +3,6 @@ package com.company;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Created by estebankramer on 12/03/2019.
- */
 
 public class Particle {
     private int id;
