@@ -41,7 +41,7 @@ public class Main {
 
         for(Particle particle : ans.keySet()){
             String toWrite = Engine.generateFileforResult(particle,ans.get(particle),molecules);
-            Engine.writeResultFile(toWrite,particle.getId(),args[2]);
+            Engine.writeResultFile(toWrite,particle.getId(),"/Users/martinascomazzon/Downloads/SimulacionDeSistemas-master/CellIndexMethod/src/main/resources");
         }
 
         for(Map.Entry<Particle,Set<Particle>> a : ans.entrySet()){
