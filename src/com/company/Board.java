@@ -40,13 +40,27 @@ public class Board {
         return rc;
     }
 
-    private Point getCell(Point location){
-        int x = (int)(location.getX()/cellSize);
-        int y = (int)(location.getY()/cellSize);
+
+    /**
+     * Returns in which cell of the board the particle is located
+     *
+     * @param position
+     * @return A Point where the particle is located in the board
+     */
+    private Point getCell(Point position){
+        int x = (int)(position.getX()/cellSize);
+        int y = (int)(position.getY()/cellSize);
         return new Point(x,y);
     }
 
 
+    /**
+     * Reads X and Y coordinates and returns all particles in cell
+     *
+     * @param x
+     * @param y
+     * @return Set of all the particles in the cell
+     */
     public Set<Particle> getParticlesInCell(int x , int y){
         if(x < 0){
             if(periodic){
@@ -80,21 +94,35 @@ public class Board {
         return board.get(new Point(x,y));
     }
 
-    private Set<Particle> getSurroundingParticles(Point field){
+    /**
+     * Receives a cell and returns all the particles inside the cell and the particles of the surrounding cells
+     *
+     * @param cell
+     * @return A Set of all the particles inside the cell and the surrounding cells
+     */
+    private Set<Particle> getSurroundingParticles(Point cell){
         Set<Particle> nearParticles = new HashSet<>();
-        nearParticles.addAll(getParticlesInCell((int )field.getX()      ,   (int) field.getY()));
-        nearParticles.addAll(getParticlesInCell((int )field.getX()      ,(int) field.getY()+1));
-        nearParticles.addAll(getParticlesInCell((int )field.getX()+1 ,(int) field.getY()+1));
-        nearParticles.addAll(getParticlesInCell((int )field.getX()+1 ,   (int) field.getY()));
-        nearParticles.addAll(getParticlesInCell((int )field.getX()+1 ,(int) field.getY()-1));
+        nearParticles.addAll(getParticlesInCell((int )cell.getX()      ,   (int) cell.getY()));
+        nearParticles.addAll(getParticlesInCell((int )cell.getX()      ,(int) cell.getY()+1));
+        nearParticles.addAll(getParticlesInCell((int )cell.getX()+1 ,(int) cell.getY()+1));
+        nearParticles.addAll(getParticlesInCell((int )cell.getX()+1 ,   (int) cell.getY()));
+        nearParticles.addAll(getParticlesInCell((int )cell.getX()+1 ,(int) cell.getY()-1));
         return nearParticles;
     }
 
-    public Set<Particle> getNeighboursOfParticle(Particle particle, Set<Particle> analyzed, Set<Particle> nearParticles){
+
+    /**
+     * Analyzes surroundingParticles around a specific particle and returns a set of particles that are inside the rc range
+     * @param particle
+     * @param analyzed
+     * @param surroundingParticles
+     * @return returns a set of particles that are inside the rc range
+     */
+    public Set<Particle> getNeighboursOfParticle(Particle particle, Set<Particle> analyzed, Set<Particle> surroundingParticles){
 
         Set<Particle> neighbours = new HashSet<>();
 
-        for(Particle other : nearParticles){
+        for(Particle other : surroundingParticles){
             if(!other.equals(particle) && !analyzed.contains(other)) {
                 if(particlesInRange(particle,other)){
                     neighbours.add(other);
@@ -105,6 +133,13 @@ public class Board {
         return neighbours;
     }
 
+
+    /**
+     * Receives two particles and returns a boolean that defines whether the two particles are in the rc range
+     * @param p1
+     * @param p2
+     * @return boolean that defines whether the two particles are in the rc range
+     */
     private boolean particlesInRange(Particle p1, Particle p2) {
 
         if(Particle.borderDistanceBetweenParticles(p1,p2) <= rc) {
@@ -130,6 +165,12 @@ public class Board {
         return false;
 
     }
+
+    /**
+     * Recieves a cell and returns a map that contains all the particles in the cell with it's neighbours
+     * @param cell
+     * @return Map with a a particle and all it's neighbours
+     */
 
     public Map<Particle,Set<Particle>> analyzeCell(Point cell){
         Set<Particle> particles = board.get(cell);

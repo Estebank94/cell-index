@@ -45,7 +45,7 @@ public class Parser {
 
             for (int i=0; i<n; i++){
                 String[] array= staticBuffer.readLine().split(" ");
-                particles.add(new Particle(i, Double.parseDouble(array[0]),new Property<String>("property"),null,0,0));
+                particles.add(new Particle(i, Double.parseDouble(array[0]),new Property<>("property"),null,0,0));
             }
             staticBuffer.close();
 

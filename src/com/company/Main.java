@@ -25,7 +25,7 @@ public class Main {
         System.out.println("Periodic board: " + (periodic ? "true" : "false"));
         long start = System.currentTimeMillis();
         Map<Particle,Set<Particle>> ans = engine.start();
-        //Map<Particle,Set<Particle>> ans = engine.bruteForce(particles);
+//        Map<Particle,Set<Particle>> ans = engine.bruteForce(particles);
         long end = System.currentTimeMillis();
 
         System.out.println("Finished, total time: " + (end-start));

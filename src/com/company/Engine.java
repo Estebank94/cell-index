@@ -21,7 +21,11 @@ public class Engine {
         neighbors = new HashMap<>();
     }
 
-    public void getNeighboursOfParticle(){
+    /**
+     * Builds Map of each particle in the board and all it's neighbours
+     */
+
+    public void getAllNeighboursOfAllParticles(){
         for(int i=0;i<m;i++){
             for(int j=0 ; j<m ;j++){
                 Map<Particle,Set<Particle>> map = board.analyzeCell(new Point(i,j));
@@ -50,7 +54,7 @@ public class Engine {
     }
 
     public Map<Particle,Set<Particle>> start(){
-        getNeighboursOfParticle();
+        getAllNeighboursOfAllParticles();
         return neighbors;
     }
 
@@ -63,12 +67,12 @@ public class Engine {
     }
 
 
-    public static String generateFileString(Particle particle, Set<Particle> neighbours,Set<Particle> allMolcules){
+    public static String generateFileString(Particle particle, Set<Particle> neighbours,Set<Particle> AllParticles){
         StringBuilder builder = new StringBuilder()
-                .append(allMolcules.size())
+                .append(AllParticles.size())
                 .append("\r\n")
                 .append("//ID\t X\t Y\t Radius\t R\t G\t B\t\r\n");
-        for(Particle current: allMolcules){
+        for(Particle current: AllParticles){
             builder.append(current.getId())
                     .append(" ")
                     .append(current.getLocation().getX())
