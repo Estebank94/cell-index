@@ -23,6 +23,17 @@ public class Board {
             for(int j = 0; j < m; j++) {
                 board.put(new Point(i * 1.0,j * 1.0), new HashSet<>());
             }
+
+        
+        for(Particle molecule : particles){
+            Point j = getCellPosition(molecule.getPosition());
+            try {
+                board.get(j).add(molecule);
+            }catch (Exception e){
+                System.out.println(j + " " +molecule);
+            }
+
+        }
     }
 
 
@@ -65,12 +76,14 @@ public class Board {
     private Set<Particle> getSurroundingParticles(Point cell) {
         Set<Particle> surroundingParticles = new HashSet<>();
         surroundingParticles.addAll(getParticlesInCell((int) cell.getX(), (int) cell.getY()));
+        surroundingParticles.addAll(getParticlesInCell((int) cell.getX() + 1, (int) cell.getY()));
         surroundingParticles.addAll(getParticlesInCell((int) cell.getX(), (int) cell.getY() + 1));
         surroundingParticles.addAll(getParticlesInCell((int) cell.getX() + 1, (int) cell.getY() + 1));
-        surroundingParticles.addAll(getParticlesInCell((int) cell.getX() + 1, (int) cell.getY()));
         surroundingParticles.addAll(getParticlesInCell((int) cell.getX() + 1, (int) cell.getY() - 1));
         return surroundingParticles;
     }
+
+
 
     private Set<Particle> getParticleNeighbours(Particle particle, Set<Particle> surroundingParticles, Set<Particle> checkedParticles) {
         Set<Particle> particleNeighbours = new HashSet<>();

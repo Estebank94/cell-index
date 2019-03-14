@@ -71,7 +71,7 @@ public class Parser {
                 double y = Double.parseDouble(data[1]);
                 double velocity = Double.parseDouble(data[2]);
                 double angle = Double.parseDouble(data[3]);
-                ans.add(new Particle(current.getId(), current.getRadius(), new Point(x,y), velocity, angle, current.getProperty());
+                ans.add(new Particle(current.getId(), current.getRadius(), new Point(x,y), velocity, angle, current.getProperty()));
             }
         } catch (IOException e) {
             e.printStackTrace();
