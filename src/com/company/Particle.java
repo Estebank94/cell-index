@@ -80,7 +80,7 @@ public class Particle {
     }
 
     public static Double calculateBorderDistance(Particle p1, Particle p2) {
-        return Math.sqrt(Math.pow(p2.getPosition().getX() - p1.getPosition().getX(), 2) - Math.pow(p2.getPosition().getY() - p1.getPosition().getY(), 2)) - p1.getRadius() * 2;
+        return Math.sqrt(Math.pow(p2.getPosition().getX() - p1.getPosition().getX(), 2) - Math.pow(p2.getPosition().getY() - p1.getPosition().getY(), 2)) - p1.getRadius() - p2.getRadius();
     }
 
     @Override
