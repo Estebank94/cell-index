@@ -11,7 +11,8 @@ public class Main {
         int l = Integer.parseInt(args[1]); //50
         int m = Integer.parseInt(args[2]); //30
         double rc = Double.parseDouble(args[3]); //0.5
-        String staticString = generateStaticFileString(n, l, m, rc, false, 1);
+        String periodic = args[4];
+        String staticString = generateStaticFileString(n, l, m, rc, periodic.equals("periodic") ? true : false, 1);
         String dynamicString = generateDynamicFileString(n, l);
 
         writeToFile(staticString, "staticFile","/Users/martinascomazzon/Downloads/input");
@@ -44,7 +45,7 @@ public class Main {
         builder.append(l + "\r\n");
         builder.append(m + "\r\n");
         builder.append(rc + "\r\n");
-        builder.append(periodic ? "periodic" : "dfkfkf" + "\r\n");
+        builder.append(periodic ? "periodic" + "\r\n" : "dfkfkf" + "\r\n");
         for(int i = 0; i < n ; i++){
             builder.append( radius > 0 ? radius : r.nextInt(l))
                     .append(" ")
