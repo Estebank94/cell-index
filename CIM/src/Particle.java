@@ -1,5 +1,3 @@
-package com.company;
-
 public class Particle {
     private int id;
     private double ratio;
