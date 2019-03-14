@@ -9,15 +9,15 @@ import java.util.Random;
 public class Main {
     public static void main(String[] args) {
         System.out.println("Generating Inputs!");
-        int n = 1000;
-        int l = 50;
-        int m = 30;
-        double rc = 0.5;
+        int n = Integer.parseInt(args[0]); //1000
+        int l = Integer.parseInt(args[1]); //50
+        int m = Integer.parseInt(args[2]); //30
+        double rc = Double.parseDouble(args[3]); //0.5
         String staticString = generateStaticFileString(n, l, m, rc, false, 1);
         String dynamicString = generateDynamicFileString(n, l);
 
-        writeToFile(staticString, "staticFile","/Users/estebankramer1/Desktop/input/");
-        writeToFile(dynamicString, "dynamicFile","/Users/estebankramer1/Desktop/input/");
+        writeToFile(staticString, "staticFile","/Users/martinascomazzon/Downloads/input");
+        writeToFile(dynamicString, "dynamicFile","/Users/martinascomazzon/Downloads/input");
 
     }
 

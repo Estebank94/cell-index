@@ -30,7 +30,7 @@ public class Main {
 
         for(Particle particle : ans.keySet()){
             String toWrite = Engine.generateFileString(particle, ans.get(particle), particles);
-            Engine.writeToFile(toWrite,particle.getId(),"/Users/estebankramer1/Desktop/results");
+            Engine.writeToFile(toWrite,particle.getId(),"/");
         }
 
         for(Map.Entry<Particle,Set<Particle>> a : ans.entrySet()){
