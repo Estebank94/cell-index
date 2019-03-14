@@ -3,9 +3,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Random;
 
-/**
- * Created by estebankramer on 14/03/2019.
- */
+
 public class Main {
     public static void main(String[] args) {
         System.out.println("Generating Inputs!");
