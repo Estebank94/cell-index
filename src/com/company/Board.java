@@ -2,70 +2,77 @@ package com.company;
 
 import java.util.*;
 
-
 public class Board {
-    private double l;
+    private int l;
     private int m;
     private double rc;
     private double cellSize;
-    private HashMap<Point, Set<Particle>> board;
-    private Boolean periodic;
+    private HashMap<Point,Set<Particle>> board;
+    private boolean periodic;
 
-    public Board(double l, int m, double rc, Set<Particle> particles, boolean periodic) {
+    public Board(int l, int m, double rc, Set<Particle> particles,boolean periodic) {
         this.l = l;
         this.m = m;
         this.rc = rc;
-        this.cellSize = l/m;
+        this.cellSize = (double)l/m;
         this.board = new HashMap<>();
         this.periodic = periodic;
 
-        for(int i = 0; i < m ; i++)
-            for(int j = 0; j < m; j++) {
-                board.put(new Point(i * 1.0,j * 1.0), new HashSet<>());
+        for(int i = 0; i < m ; i++){
+            for(int j = 0 ; j < m ; j++) {
+                board.put(new Point(i, j), new HashSet<>());
             }
+        }
 
-        
-        for(Particle molecule : particles){
-            Point j = getCellPosition(molecule.getPosition());
+        for(Particle particle : particles){
+            Point j = getCell(particle.getLocation());
             try {
-                board.get(j).add(molecule);
+                board.get(j).add(particle);
             }catch (Exception e){
-                System.out.println(j + " " +molecule);
+                System.out.println(j + " " +particle);
             }
 
         }
+
+    }
+
+    public double getRc() {
+        return rc;
+    }
+
+    private Point getCell(Point location){
+        int x = (int)(location.getX()/cellSize);
+        int y = (int)(location.getY()/cellSize);
+        return new Point(x,y);
     }
 
 
-    public Point getCellPosition(Point position) {
-        return new Point( (int) position.getX()/cellSize, (int) position.getY()/cellSize);
-    }
-
-
-    public Set<Particle> getParticlesInCell(int x, int y) {
-        if(x < 0) {
-            if(periodic) {
+    public Set<Particle> getParticlesInCell(int x , int y){
+        if(x < 0){
+            if(periodic){
                 return getParticlesInCell(x+m,y);
-            } else {
+            }else{
                 return Collections.EMPTY_SET;
             }
 
-        } if(x >= m) {
+        } if(x >= m){
             if(periodic){
                 return getParticlesInCell(x-m,y);
             }else{
                 return Collections.EMPTY_SET;
             }
-        } if(y < 0) {
-            if(periodic) {
+        }
+        if (y <0){
+            if(periodic){
                 return getParticlesInCell(x,y+m);
-            } else {
+            }else{
                 return Collections.EMPTY_SET;
             }
-        } if(y >= m) {
-            if(periodic) {
+        }
+        if( y>=m){
+            if(periodic){
                 return getParticlesInCell(x,y-m);
-            } else {
+            }else{
                 return Collections.EMPTY_SET;
             }
 
@@ -73,65 +80,70 @@ public class Board {
         return board.get(new Point(x,y));
     }
 
-    private Set<Particle> getSurroundingParticles(Point cell) {
-        Set<Particle> surroundingParticles = new HashSet<>();
-        surroundingParticles.addAll(getParticlesInCell((int) cell.getX(), (int) cell.getY()));
-        surroundingParticles.addAll(getParticlesInCell((int) cell.getX() + 1, (int) cell.getY()));
-        surroundingParticles.addAll(getParticlesInCell((int) cell.getX(), (int) cell.getY() + 1));
-        surroundingParticles.addAll(getParticlesInCell((int) cell.getX() + 1, (int) cell.getY() + 1));
-        surroundingParticles.addAll(getParticlesInCell((int) cell.getX() + 1, (int) cell.getY() - 1));
-        return surroundingParticles;
+    private Set<Particle> getSurroundingParticles(Point field){
+        Set<Particle> nearParticles = new HashSet<>();
+        nearParticles.addAll(getParticlesInCell((int )field.getX()      ,   (int) field.getY()));
+        nearParticles.addAll(getParticlesInCell((int )field.getX()      ,(int) field.getY()+1));
+        nearParticles.addAll(getParticlesInCell((int )field.getX()+1 ,(int) field.getY()+1));
+        nearParticles.addAll(getParticlesInCell((int )field.getX()+1 ,   (int) field.getY()));
+        nearParticles.addAll(getParticlesInCell((int )field.getX()+1 ,(int) field.getY()-1));
+        return nearParticles;
     }
 
+    public Set<Particle> getNeighboursOfParticle(Particle particle, Set<Particle> analyzed, Set<Particle> nearParticles){
 
+        Set<Particle> neighbours = new HashSet<>();
 
-    private Set<Particle> getParticleNeighbours(Particle particle, Set<Particle> surroundingParticles, Set<Particle> checkedParticles) {
-        Set<Particle> particleNeighbours = new HashSet<>();
-
-        for(Particle p : surroundingParticles) {
-            if(!p.equals(particle) && !checkedParticles.contains(p) && particlesInRange(particle, p)){
-                particleNeighbours.add(p);
+        for(Particle other : nearParticles){
+            if(!other.equals(particle) && !analyzed.contains(other)) {
+                if(particlesInRange(particle,other)){
+                    neighbours.add(other);
+                }
             }
         }
 
-        return particleNeighbours;
+        return neighbours;
     }
 
     private boolean particlesInRange(Particle p1, Particle p2) {
-        if(Particle.calculateBorderDistance(p1,p2) <= rc) {
+
+        if(Particle.borderDistanceBetweenParticles(p1,p2) <= rc) {
             return true;
         }
 
-        if(!periodic) {
-            return false;
+        if(periodic){
+            double mx = p1.getLocation().getX();
+            double my = p1.getLocation().getY();
+            double ox = p2.getLocation().getX();
+            double oy = p2.getLocation().getY();
+
+            return Point.distanceBetween(new Point(mx,my+l), new Point(ox,oy)) - p1.getRatio() - p2.getRatio() <= rc
+                    || Point.distanceBetween(new Point(mx+l,my), new Point(ox,oy)) - p1.getRatio() - p2.getRatio() <= rc
+                    || Point.distanceBetween(new Point(mx+l,my+l), new Point(ox,oy)) - p1.getRatio() - p2.getRatio() <= rc
+                    || Point.distanceBetween(new Point(mx+l,my-l), new Point(ox,oy)) - p1.getRatio() - p2.getRatio() <= rc
+                    || Point.distanceBetween(new Point(mx,my-l), new Point(ox,oy)) - p1.getRatio() - p2.getRatio() <= rc
+                    || Point.distanceBetween(new Point(mx-l,my-l), new Point(ox,oy)) - p1.getRatio() - p2.getRatio() <= rc
+                    || Point.distanceBetween(new Point(mx-l,my), new Point(ox,oy)) - p1.getRatio() - p2.getRatio() <= rc
+                    || Point.distanceBetween(new Point(mx-l,my+l), new Point(ox,oy)) - p1.getRatio() - p2.getRatio() <= rc;
         }
 
-        /*TODO: falta caso periodic*/
         return false;
+
     }
 
-    /* me devuelve todas las particulas que cumplen con el radio de acción y estan en las celdas vecinas*/
-    public Map<Particle, Set<Particle>> getAllCellNeighbours(Point cell) {
-        /*me va a dar todas las particulas de una cell determianda*/
-        Set<Particle> cellParticles = board.get(cell);
+    public Map<Particle,Set<Particle>> analyzeCell(Point cell){
+        Set<Particle> particles = board.get(cell);
         Set<Particle> surroundingParticles = getSurroundingParticles(cell);
 
-        Set<Particle> checkedParticles = new HashSet<>();
-        Map<Particle, Set<Particle>> allCellNeighbours = new HashMap<>();
+        Set<Particle> analyzed = new HashSet<>();
+        Map<Particle,Set<Particle>> cellNeighbours = new HashMap<>();
 
-        for(Particle p : cellParticles) {
-            /*aca ya le voy a estar "adjuntando" a la particula las particulas vecinas que cumplan
-            con el radio de accion
-             */
-            Set<Particle> particleNeighbours = getParticleNeighbours(p, surroundingParticles, checkedParticles);
-            checkedParticles.add(p);
-            allCellNeighbours.put(p, particleNeighbours);
+        for(Particle particle : particles){
+            Set<Particle> neighbors = getNeighboursOfParticle(particle,analyzed, surroundingParticles);
+
+            analyzed.add(particle);
+            cellNeighbours.put(particle,neighbors);
         }
-
-        return allCellNeighbours;
+        return cellNeighbours;
     }
-
-
-
-
 }
