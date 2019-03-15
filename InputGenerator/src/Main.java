@@ -6,17 +6,25 @@ import java.util.Random;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Generating Inputs!");
+        if( args.length < 5 ) {
+            System.out.println("Wrong arguments");
+            return;
+        }
         int n = Integer.parseInt(args[0]); //1000
         int l = Integer.parseInt(args[1]); //50
         int m = Integer.parseInt(args[2]); //30
         double rc = Double.parseDouble(args[3]); //0.5
         String periodic = args[4];
-        String staticString = generateStaticFileString(n, l, m, rc, periodic.equals("periodic") ? true : false, 1);
+        if( (double) l/m <= rc ) {
+            System.out.println("l/m must be higher than rc!");
+            return;
+        }
+        System.out.println("Generating Inputs!");
+        String staticString = generateStaticFileString(n, l, m, rc, periodic.equals("periodic") ? true : false, 0.25);
         String dynamicString = generateDynamicFileString(n, l);
 
-        writeToFile(staticString, "staticFile","/Users/martinascomazzon/Downloads/input");
-        writeToFile(dynamicString, "dynamicFile","/Users/martinascomazzon/Downloads/input");
+        writeToFile(staticString, "staticFile","/Users/estebankramer1/Documents/ITBA/4A1C/Simulacion/CIM/resources/");
+        writeToFile(dynamicString, "dynamicFile","/Users/estebankramer1/Documents/ITBA/4A1C/Simulacion/CIM/resources/");
 
     }
 

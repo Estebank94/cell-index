@@ -150,14 +150,14 @@ public class Board {
             double ox = p2.getLocation().getX();
             double oy = p2.getLocation().getY();
 
-            return Point.distanceBetween(new Point(mx,my+l), new Point(ox,oy)) - p1.getRatio() - p2.getRatio() <= rc
-                    || Point.distanceBetween(new Point(mx+l,my), new Point(ox,oy)) - p1.getRatio() - p2.getRatio() <= rc
-                    || Point.distanceBetween(new Point(mx+l,my+l), new Point(ox,oy)) - p1.getRatio() - p2.getRatio() <= rc
-                    || Point.distanceBetween(new Point(mx+l,my-l), new Point(ox,oy)) - p1.getRatio() - p2.getRatio() <= rc
-                    || Point.distanceBetween(new Point(mx,my-l), new Point(ox,oy)) - p1.getRatio() - p2.getRatio() <= rc
-                    || Point.distanceBetween(new Point(mx-l,my-l), new Point(ox,oy)) - p1.getRatio() - p2.getRatio() <= rc
-                    || Point.distanceBetween(new Point(mx-l,my), new Point(ox,oy)) - p1.getRatio() - p2.getRatio() <= rc
-                    || Point.distanceBetween(new Point(mx-l,my+l), new Point(ox,oy)) - p1.getRatio() - p2.getRatio() <= rc;
+            return Particle.borderDistanceBetweenParticles(new Particle(new Point(mx,my+l)), new Particle(new Point(ox,oy))) <= rc
+                    || Particle.borderDistanceBetweenParticles(new Particle(new Point(mx + l,my)), new Particle(new Point(ox,oy))) <= rc
+                    || Particle.borderDistanceBetweenParticles(new Particle(new Point(mx + l,my+l)), new Particle(new Point(ox,oy))) <= rc
+                    || Particle.borderDistanceBetweenParticles(new Particle(new Point(mx + l,my - l)), new Particle(new Point(ox,oy))) <= rc
+                    || Particle.borderDistanceBetweenParticles(new Particle(new Point(mx,my-l)), new Particle(new Point(ox,oy))) <= rc
+                    || Particle.borderDistanceBetweenParticles(new Particle(new Point(mx - l ,my - l)), new Particle(new Point(ox,oy))) <= rc
+                    || Particle.borderDistanceBetweenParticles(new Particle(new Point(mx - l,my)), new Particle(new Point(ox,oy))) <= rc
+                    || Particle.borderDistanceBetweenParticles(new Particle(new Point(mx - l,my+l)), new Particle(new Point(ox,oy))) <= rc;
         }
 
         return false;

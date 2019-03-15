@@ -36,10 +36,15 @@ public class Engine {
                         neighbors.put(particle, map.get(particle));
                     }
 
+                    //por todos los vecinos de la particula que estoy analizando
                     for (Particle m : map.get(particle)) {
                         if (neighbors.containsKey(m)) {
+//                          si ya esta en el mapa de todas las particulas con todos los vecinos, entonces
+//                          agrego a la particula que estoy analizando ahora ya que la relacion de vecinos es reflexiva
                             neighbors.get(m).add(particle);
                         } else {
+//                            si no estaba, la agrego al mapa de todas las particulas con todos los vecinos y le agrego
+//                            la particula que estoy analizando ya que la relacio nde vecinos es reflexiva
                             HashSet<Particle> set = new HashSet<>();
                             set.add(particle);
                             neighbors.put(m, set);

@@ -15,6 +15,10 @@ public class Particle {
         this.angle = angle;
     }
 
+    public Particle(Point location) {
+        this.location = location;
+    }
+
     public int getId() {
         return id;
     }

@@ -3,6 +3,8 @@ import java.util.Set;
 
 public class Main {
 
+//    /Users/estebankramer1/Documents/ITBA/4A1C/Simulacion/CIM/resources/staticrand.txt  /Users/estebankramer1/Documents/ITBA/4A1C/Simulacion/CIM/resources/dynamicrand.txt
+
     public static void main (String [ ] args) {
 
         Parser parser = new Parser(args[0],args[1]);
@@ -30,7 +32,7 @@ public class Main {
 
         for(Particle particle : ans.keySet()){
             String toWrite = Engine.generateFileString(particle, ans.get(particle), particles);
-            Engine.writeToFile(toWrite,particle.getId(),"/");
+            Engine.writeToFile(toWrite,particle.getId(),"/Users/estebankramer1/Desktop/results");
         }
 
         for(Map.Entry<Particle,Set<Particle>> a : ans.entrySet()){
