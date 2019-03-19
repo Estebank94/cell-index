@@ -1,8 +1,5 @@
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by estebankramer on 13/03/2019.
@@ -25,6 +22,7 @@ public class Parser {
         File dynamicFile = new File(d);
         time=0;
         particles = new ArrayList<>();
+        Random r = new Random();
 
         try {
             staticBuffer = new BufferedReader(new FileReader(staticFile));
@@ -43,7 +41,7 @@ public class Parser {
 
             for (int i=0; i<n; i++){
                 String[] array= staticBuffer.readLine().split(" ");
-                particles.add(new Particle(i, Double.parseDouble(array[0]),new Property<>("property"),null,0,0));
+                particles.add(new Particle(i, Double.parseDouble(array[0]),new Property<>("property"),null,0,(360) * r.nextDouble()));
             }
             staticBuffer.close();
 
@@ -85,8 +83,7 @@ public class Parser {
                 double x=Double.parseDouble(data[0]);
                 double y=Double.parseDouble(data[1]);
                 double velocity=Double.parseDouble(data[2]);
-                double angle=Double.parseDouble(data[3]);
-                ans.add(new Particle(current.getId(),current.getRatio(),null,new Point(x,y),velocity,angle));
+                ans.add(new Particle(current.getId(),current.getRatio(),null,new Point(x,y),velocity,current.getAngle()));
             }
         }catch (IOException e){
             e.printStackTrace();
