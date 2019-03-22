@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -33,31 +34,47 @@ public class Main {
 
         Map<Particle,Set<Particle>> ans = engine.start();
 
-        for(Particle particle : ans.keySet()){
-            String toWrite = Engine.generateFileString(particle, ans.get(particle), particles);
-            Engine.writeToFile(toWrite,particle.getId(),"/Users/estebankramer1/Desktop/results");
-        }
+        /* tiempo maximo donde tenemos que tener en cuenta cuando llega a un estado
+        estacionario*/
+        final int maxTime = 1000;
+        boolean polarized = false;
+        double va = 0;
 
-        for(Map.Entry<Particle,Set<Particle>> a : ans.entrySet()){
+        long start = System.currentTimeMillis();
 
-            System.out.print(a.getKey().getId()+" : ");
+        for(int i=0; i<maxTime && !polarized;  i++){
 
-            for(Particle p: a.getValue()){
-                System.out.print(p.getId()+" ");
+            Set<Particle> newParticles = calculateNewParticles(ans, eta);
+            va = calculateVa(newParticles);
+            engine = new Engine(L, M, Rc, periodic, newParticles);
+            ans = engine.start();
+
+            String file = generateFileString(newParticles);
+            writeToFile(file, i, args[3]);
+
+            if(va > 0.999999){
+                polarized = true;
             }
 
-            System.out.println();
         }
+
+        long end = System.currentTimeMillis();
+        System.out.println("Va:" + va + "\t");
+
+        System.out.println("Time: " + (end-start) + "ms");
+
+
     }
 
-    public double calculateAngle(Particle p, Map<Particle, Set<Particle>> map, double eta) {
+
+    public static double calculateAngle(Particle p, Map<Particle, Set<Particle>> map, double eta) {
         Set<Particle> neighbours = map.get(p);
         Random r = new Random();
         double totalSin = 0;
         double totalCos = 0;
-        for(Particle p : neighbours) {
-            totalSin += Math.sin(p.getAngle());
-            totalCos += Math.cos(p.getAngle());
+        for(Particle particle : neighbours) {
+            totalSin += Math.sin(particle.getAngle());
+            totalCos += Math.cos(particle.getAngle());
         }
         totalSin = totalSin / neighbours.size();
         totalCos = totalCos / neighbours.size();
@@ -65,13 +82,13 @@ public class Main {
         return Math.atan2(totalSin, totalCos) + eta/2 * r.nextDouble();;
     }
 
-    public Point calculatePosition(Particle p, double angle) {
+    public static Point calculatePosition(Particle p, double angle) {
         double x = p.getLocation().getX() + p.getVelocity() * Math.cos(angle);
         double y = p.getLocation().getY() + p.getVelocity() * Math.sin(angle);
         return new Point(x, y);
     }
 
-    public double calculateVa(Set<Particle> particles) {
+    public static double calculateVa(Set<Particle> particles) {
         double vx = 0;
         double vy = 0;
 
@@ -85,29 +102,29 @@ public class Main {
         return 1/(particles.size() * VELOCITY) * Math.sqrt(Math.pow(vx, 2) + Math.pow(vy, 2));
     }
 
-    public Set<Particle> OffLatice(Map<Particle, Set<Particle>> map, double eta) {
-        Set<Particle> particles = map.keySet();
+    public static Set<Particle> calculateNewParticles(Map<Particle, Set<Particle>> map, double eta) {
+        Set<Particle> particles = new HashSet<>();
         double angle;
-        double va;
 
-        for(Particle p : particles) {
+        for(Particle p : map.keySet()) {
             angle = calculateAngle(p, map, eta);
-            p.setAngle(angle);
-            p.setLocation(calculatePosition(p, angle));
+            Particle particle = new Particle(p.getId(), p.getRatio(), null, calculatePosition(p, angle), p.getVelocity(), angle);
+            particles.add(particle);
         }
-        va = calculateVa(particles);
+
+        return particles;
 
     }
 
-    public static void writeToFile(String data, int inedx, String path){
+    public static void writeToFile(String data, int index, String path){
         try {
-            Files.write(Paths.get(path + "/results" + inedx + ".txt"), data.getBytes());
+            Files.write(Paths.get(path + "/results" + index + ".txt"), data.getBytes());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static String generateFileString(Particle particle, Set<Particle> neighbours,Set<Particle> AllParticles){
+    public static String generateFileString(Set<Particle> AllParticles){
         StringBuilder builder = new StringBuilder()
                 .append(AllParticles.size())
                 .append("\r\n")
