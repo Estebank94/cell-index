@@ -23,8 +23,8 @@ public class Main {
         String staticString = generateStaticFileString(n, l, m, rc, periodic.equals("periodic") ? true : false, 0.25);
         String dynamicString = generateDynamicFileString(n, l);
 
-        writeToFile(staticString, "staticFile","/Users/estebankramer1/Documents/ITBA/4A1C/Simulacion/CIM/resources/");
-        writeToFile(dynamicString, "dynamicFile","/Users/estebankramer1/Documents/ITBA/4A1C/Simulacion/CIM/resources/");
+        writeToFile(staticString, "staticFile","/Users/martinascomazzon/Downloads/");
+        writeToFile(dynamicString, "dynamicFile","/Users/martinascomazzon/Downloads/");
 
     }
 

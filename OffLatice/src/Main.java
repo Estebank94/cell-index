@@ -44,7 +44,7 @@ public class Main {
 
         for(int i=0; i<maxTime && !polarized;  i++){
 
-            Set<Particle> newParticles = calculateNewParticles(ans, eta);
+            Set<Particle> newParticles = calculateNewParticles(ans, eta, L);
             va = calculateVa(newParticles);
             engine = new Engine(L, M, Rc, periodic, newParticles);
             ans = engine.start();
@@ -69,7 +69,7 @@ public class Main {
 
     public static double calculateAngle(Particle p, Map<Particle, Set<Particle>> map, double eta) {
         Set<Particle> neighbours = map.get(p);
-        Random r = new Random();
+
         double totalSin = 0;
         double totalCos = 0;
         for(Particle particle : neighbours) {
@@ -79,36 +79,55 @@ public class Main {
         totalSin = totalSin / neighbours.size();
         totalCos = totalCos / neighbours.size();
 
-        return Math.atan2(totalSin, totalCos) + eta/2 * r.nextDouble();
+        double n = new Random().nextDouble()*eta-eta/2;
+        return Math.atan2(totalSin/(neighbours.size() + 1), totalCos/(neighbours.size() + 1)) + n;
     }
 
-    public static Point calculatePosition(Particle p, double angle) {
+    public static Point calculatePosition(Particle p, double angle, int L) {
         double x = p.getLocation().getX() + p.getVelocity() * Math.cos(angle);
         double y = p.getLocation().getY() + p.getVelocity() * Math.sin(angle);
+
+        x = x%L;
+        y= y%L;
+
+        if(y<0){
+            y+=L;
+        }
+        if(x<0){
+            x+=L;
+        }
+
+
         return new Point(x, y);
     }
 
     public static double calculateVa(Set<Particle> particles) {
-        double vx = 0;
-        double vy = 0;
+        double totalVx = 0;
+        double totalVy = 0;
+        double velocity = 0;
 
         for(Particle p : particles) {
-            vx += Math.cos(p.getAngle()) * p.getVelocity();
-            vy += Math.sin(p.getAngle()) * p.getVelocity();
-        }
-        vx /= particles.size();
-        vy /= particles.size();
+            totalVx += p.getVelocity()*Math.cos(p.getAngle());
+            totalVy += p.getVelocity()*Math.sin(p.getAngle());
 
-        return 1/(particles.size() * VELOCITY) * Math.sqrt(Math.pow(vx, 2) + Math.pow(vy, 2));
+            velocity = p.getVelocity();
+        }
+
+        totalVx /= particles.size();
+        totalVy /= particles.size();
+
+        double totalVi = Math.sqrt(Math.pow(totalVx, 2) + Math.pow(totalVy, 2));
+
+        return totalVi / (velocity);
     }
 
-    public static Set<Particle> calculateNewParticles(Map<Particle, Set<Particle>> map, double eta) {
+    public static Set<Particle> calculateNewParticles(Map<Particle, Set<Particle>> map, double eta, int L) {
         Set<Particle> particles = new HashSet<>();
         double angle;
 
         for(Particle p : map.keySet()) {
             angle = calculateAngle(p, map, eta);
-            Particle particle = new Particle(p.getId(), p.getRatio(), null, calculatePosition(p, angle), p.getVelocity(), angle);
+            Particle particle = new Particle(p.getId(), p.getRatio(), null, calculatePosition(p, angle, L), p.getVelocity(), angle);
             particles.add(particle);
         }
 
@@ -138,9 +157,9 @@ public class Main {
                     .append(" ")
                     .append(current.getRatio())
                     .append(" ")
-                    .append(current.calculateVx())
+                    .append(current.calculateVx()*1000)
                     .append("")
-                    .append(current.calculateVy())
+                    .append(current.calculateVy()*1000)
                     .append(current.getAngle())
                     .append("\r\n");
         }

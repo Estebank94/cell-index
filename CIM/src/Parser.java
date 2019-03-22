@@ -41,7 +41,7 @@ public class Parser {
 
             for (int i=0; i<n; i++){
                 String[] array= staticBuffer.readLine().split(" ");
-                particles.add(new Particle(i, Double.parseDouble(array[0]),new Property<>("property"),null,0,2*Math.PI * r.nextDouble()));
+                particles.add(new Particle(i, Double.parseDouble(array[0]),new Property<>("property"),null,0.03,2*Math.PI * r.nextDouble()));
             }
             staticBuffer.close();
 
@@ -83,7 +83,7 @@ public class Parser {
                 double x=Double.parseDouble(data[0]);
                 double y=Double.parseDouble(data[1]);
                 //double velocity=Double.parseDouble(data[2]);
-                double velocity = 0.3;
+                double velocity = 0.03;
                 ans.add(new Particle(current.getId(),current.getRatio(),null,new Point(x,y),velocity,current.getAngle()));
             }
         }catch (IOException e){
