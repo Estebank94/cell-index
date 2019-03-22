@@ -36,13 +36,13 @@ public class Main {
 
         /* tiempo maximo donde tenemos que tener en cuenta cuando llega a un estado
         estacionario*/
-        final int maxTime = 1000;
+        final int maxTime = 4000;
         boolean polarized = false;
         double va = 0;
 
         long start = System.currentTimeMillis();
 
-        for(int i=0; i<maxTime && !polarized;  i++){
+        for(int i=0; !polarized;  i++){
 
             Set<Particle> newParticles = calculateNewParticles(ans, eta, L);
             va = calculateVa(newParticles);
@@ -76,8 +76,7 @@ public class Main {
             totalSin += Math.sin(particle.getAngle());
             totalCos += Math.cos(particle.getAngle());
         }
-        totalSin = totalSin / neighbours.size();
-        totalCos = totalCos / neighbours.size();
+
 
         double n = new Random().nextDouble()*eta-eta/2;
         return Math.atan2(totalSin/(neighbours.size() + 1), totalCos/(neighbours.size() + 1)) + n;
