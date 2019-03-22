@@ -79,7 +79,7 @@ public class Main {
         totalSin = totalSin / neighbours.size();
         totalCos = totalCos / neighbours.size();
 
-        return Math.atan2(totalSin, totalCos) + eta/2 * r.nextDouble();;
+        return Math.atan2(totalSin, totalCos) + eta/2 * r.nextDouble();
     }
 
     public static Point calculatePosition(Particle p, double angle) {
