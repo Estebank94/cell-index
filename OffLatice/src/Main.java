@@ -42,7 +42,7 @@ public class Main {
 
         long start = System.currentTimeMillis();
 
-        for(int i=0; !polarized;  i++){
+        for(int i=0; i < maxTime && !polarized;  i++){
 
             Set<Particle> newParticles = calculateNewParticles(ans, eta, L);
             va = calculateVa(newParticles);
@@ -52,7 +52,7 @@ public class Main {
             String file = generateFileString(newParticles);
             writeToFile(file, i, args[3]);
 
-            if(va > 0.999999){
+            if(va > 0.999){
                 polarized = true;
             }
 
@@ -142,12 +142,15 @@ public class Main {
         }
     }
 
-    public static String generateFileString(Set<Particle> AllParticles){
+    public static String generateFileString(Set<Particle> allParticles){
+
         StringBuilder builder = new StringBuilder()
-                .append(AllParticles.size())
+                .append(allParticles.size())
                 .append("\r\n")
-                .append("//ID\t X\t Y\t Radius\t vx\t vy\t Angle\r\n");
-        for(Particle current: AllParticles){
+                .append("//ID\t X\t Y\t Radius\t R\t G\t B\t vx\t vy\t \r\n");
+        for(Particle current: allParticles){
+            double vx = current.getVelocity()*Math.cos(current.getAngle());
+            double vy = current.getVelocity()*Math.sin(current.getAngle());
             builder.append(current.getId())
                     .append(" ")
                     .append(current.getLocation().getX())
@@ -156,13 +159,56 @@ public class Main {
                     .append(" ")
                     .append(current.getRatio())
                     .append(" ")
-                    .append(current.calculateVx()*1000)
-                    .append("")
-                    .append(current.calculateVy()*1000)
+                    .append(getRGBDouble(current.getAngle()))
+                    .append(vx*1000)
+                    .append(" ")
+                    .append(vy*1000)
+                    .append(" ")
                     .append(current.getAngle())
                     .append("\r\n");
+
+
         }
         return builder.toString();
+    }
+
+
+    private static String getRGBDouble(double radius){
+        while(radius<0){
+            radius+=Math.PI*2;
+        }
+        double r,g,b;
+        if(radius <Math.PI/3){
+            r=1;
+            g=(radius/(Math.PI/3));
+            b=0;
+        }else if( radius < Math.PI*2/3){
+            r=1-((radius-Math.PI/3)/(Math.PI/3));
+            g=1;
+            b=0;
+        }else if(radius < Math.PI){
+            r=0;
+            g=1;
+            b=((radius-2*Math.PI/3)/(Math.PI/3));
+
+        }else if(radius< Math.PI*4/3){
+            r=0;
+            g=1-((radius-Math.PI)/(Math.PI/3));
+            b=255;
+        }else if(radius < Math.PI*5/3){
+            r=((radius-4*Math.PI/3)/(Math.PI/3));
+            g=0;
+            b=255;
+        }else if(radius<= Math.PI*2){
+            r=255;
+            g=0;
+            b=1-((radius-5*Math.PI/3)/(Math.PI/3));
+        }else {
+            r=1;
+            g=1;
+            b=1;
+        }
+        return r+" "+g+" "+b+" ";
     }
 
 }

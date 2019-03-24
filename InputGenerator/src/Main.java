@@ -33,13 +33,13 @@ public class Main {
         StringBuilder builder = new StringBuilder();
         builder.append("t0\r\n");
         for(int i = 0; i < n ; i++){
-            builder.append(r.nextInt(l))
+            builder.append(r.nextDouble()*l)
                     .append(" ")
-                    .append(r.nextInt(l))
+                    .append(r.nextDouble()*l)
                     .append(" ")
-                    .append(r.nextInt(l))
+                    .append(r.nextDouble())
                     .append(" ")
-                    .append(r.nextInt(l))
+                    .append(r.nextDouble())
                     .append("\r\n");
 
         }
