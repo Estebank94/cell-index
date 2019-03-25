@@ -1,10 +1,7 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 public class Main {
     private final static double VELOCITY = 0.03;
@@ -33,30 +30,43 @@ public class Main {
         Engine engine = new Engine(L,M,Rc,periodic,particles);
 
         Map<Particle,Set<Particle>> ans = engine.start();
+        List<Double> allVas = new ArrayList<>();
 
         /* tiempo maximo donde tenemos que tener en cuenta cuando llega a un estado
         estacionario*/
-        final int maxTime = 4000;
+        final int maxTime = 1500;
         boolean polarized = false;
-        double va = 0;
+        double va = -1;
+        double oldVa;
+        int count = 0;
 
         long start = System.currentTimeMillis();
 
         for(int i=0; i < maxTime && !polarized;  i++){
 
             Set<Particle> newParticles = calculateNewParticles(ans, eta, L);
+            oldVa = va;
             va = calculateVa(newParticles);
+            allVas.add(va);
             engine = new Engine(L, M, Rc, periodic, newParticles);
             ans = engine.start();
 
-            String file = generateFileString(newParticles);
+            String file = generateParticleFileString(newParticles);
             writeToFile(file, i, args[3]);
 
-            if(va > 0.999){
-                polarized = true;
+            if(Math.abs(va - oldVa) < 0.001) {
+                count++;
+                if(count >= 3) {
+                    polarized = true;
+                }
+            }
+            else {
+                count = 0;
             }
 
         }
+        String file = generateVaFileString(allVas);
+        writeToFile(file, args[3]);
 
         long end = System.currentTimeMillis();
         System.out.println("Va:" + va + "\t");
@@ -134,15 +144,24 @@ public class Main {
 
     }
 
-    public static void writeToFile(String data, int index, String path){
+    public static void writeToFile(String data, String path){
         try {
-            Files.write(Paths.get(path + "/results" + index + ".txt"), data.getBytes());
+                Files.write(Paths.get(path + "/va.txt"), data.getBytes());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static String generateFileString(Set<Particle> allParticles){
+    public static void writeToFile(String data, int index, String path){
+        try {
+            Files.write(Paths.get(path + "/results" + index + ".txt"), data.getBytes());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static String generateParticleFileString(Set<Particle> allParticles){
 
         StringBuilder builder = new StringBuilder()
                 .append(allParticles.size())
@@ -168,6 +187,21 @@ public class Main {
                     .append("\r\n");
 
 
+        }
+        return builder.toString();
+    }
+
+    public static String generateVaFileString(List<Double> allVas){
+        int i = 0;
+        StringBuilder builder = new StringBuilder()
+                .append(allVas.size())
+                .append("\r\n")
+                .append("//count\t va\t \r\n");
+        for(Double current: allVas){
+            builder.append(i++)
+                    .append(" ")
+                    .append(current)
+                    .append("\r\n");
         }
         return builder.toString();
     }
