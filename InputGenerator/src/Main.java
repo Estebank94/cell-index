@@ -15,16 +15,16 @@ public class Main {
         int m = Integer.parseInt(args[2]); //30
         double rc = Double.parseDouble(args[3]); //0.5
         String periodic = args[4];
-        if( (double) l/m <= rc ) {
+        if( (double) l/m < rc ) {
             System.out.println("l/m must be higher than rc!");
             return;
         }
         System.out.println("Generating Inputs!");
-        String staticString = generateStaticFileString(n, l, m, rc, periodic.equals("periodic") ? true : false, 0.25);
+        String staticString = generateStaticFileString(n, l, m, rc, periodic.equals("periodic") ? true : false, 0);
         String dynamicString = generateDynamicFileString(n, l);
 
-        writeToFile(staticString, "staticFile","/Users/martinascomazzon/Downloads/");
-        writeToFile(dynamicString, "dynamicFile","/Users/martinascomazzon/Downloads/");
+        writeToFile(staticString, "staticFile","/Users/martinascomazzon/Documents/2019/files/");
+        writeToFile(dynamicString, "dynamicFile","/Users/martinascomazzon/Documents/2019/files/");
 
     }
 
@@ -55,7 +55,7 @@ public class Main {
         builder.append(rc + "\r\n");
         builder.append(periodic ? "periodic" + "\r\n" : "dfkfkf" + "\r\n");
         for(int i = 0; i < n ; i++){
-            builder.append( radius > 0 ? radius : r.nextInt(l))
+            builder.append( radius == 0 ? radius : r.nextInt(l))
                     .append(" ")
                     .append("property" + i)
                     .append("\r\n");

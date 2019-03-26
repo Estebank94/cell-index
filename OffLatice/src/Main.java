@@ -42,11 +42,12 @@ public class Main {
 
         long start = System.currentTimeMillis();
 
-        for(int i=0; i < maxTime && !polarized;  i++){
+        for(int i=0; i < maxTime /*&& !polarized*/;  i++){
 
             Set<Particle> newParticles = calculateNewParticles(ans, eta, L);
             oldVa = va;
             va = calculateVa(newParticles);
+
             allVas.add(va);
             engine = new Engine(L, M, Rc, periodic, newParticles);
             ans = engine.start();
@@ -54,15 +55,15 @@ public class Main {
             String file = generateParticleFileString(newParticles);
             writeToFile(file, i, args[3]);
 
-            if(Math.abs(va - oldVa) < 0.001) {
-                count++;
-                if(count >= 3) {
-                    polarized = true;
-                }
-            }
-            else {
-                count = 0;
-            }
+//            if(Math.abs(va - oldVa) < 0.001) {
+//                count++;
+//                if(count >= 3) {
+//                    polarized = true;
+//                }
+//            }
+//            else {
+//                count = 0;
+//            }
 
         }
         String file = generateVaFileString(allVas);
@@ -70,7 +71,6 @@ public class Main {
 
         long end = System.currentTimeMillis();
         System.out.println("Va:" + va + "\t");
-
         System.out.println("Time: " + (end-start) + "ms");
 
 
@@ -178,7 +178,6 @@ public class Main {
                     .append(" ")
                     .append(current.getRatio())
                     .append(" ")
-                    .append(getRGBDouble(current.getAngle()))
                     .append(vx*1000)
                     .append(" ")
                     .append(vy*1000)
@@ -204,45 +203,6 @@ public class Main {
                     .append("\r\n");
         }
         return builder.toString();
-    }
-
-
-    private static String getRGBDouble(double radius){
-        while(radius<0){
-            radius+=Math.PI*2;
-        }
-        double r,g,b;
-        if(radius <Math.PI/3){
-            r=1;
-            g=(radius/(Math.PI/3));
-            b=0;
-        }else if( radius < Math.PI*2/3){
-            r=1-((radius-Math.PI/3)/(Math.PI/3));
-            g=1;
-            b=0;
-        }else if(radius < Math.PI){
-            r=0;
-            g=1;
-            b=((radius-2*Math.PI/3)/(Math.PI/3));
-
-        }else if(radius< Math.PI*4/3){
-            r=0;
-            g=1-((radius-Math.PI)/(Math.PI/3));
-            b=255;
-        }else if(radius < Math.PI*5/3){
-            r=((radius-4*Math.PI/3)/(Math.PI/3));
-            g=0;
-            b=255;
-        }else if(radius<= Math.PI*2){
-            r=255;
-            g=0;
-            b=1-((radius-5*Math.PI/3)/(Math.PI/3));
-        }else {
-            r=1;
-            g=1;
-            b=1;
-        }
-        return r+" "+g+" "+b+" ";
     }
 
 }
