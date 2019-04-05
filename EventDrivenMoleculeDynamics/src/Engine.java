@@ -9,7 +9,7 @@ public class Engine {
 
     private double boxSize;
     public double calculateSigma(Particle p1, Particle p2) {
-        return p1.getRatio() + p2.getRatio();
+        return p1.getRadius() + p2.getRadius();
     }
 
     /*Radius are in meters and Mass are in grams*/
@@ -68,15 +68,15 @@ public class Engine {
         double timeX = Double.POSITIVE_INFINITY;
         double timeY = Double.POSITIVE_INFINITY;
         if(p.getVx() > 0) {
-            timeX = (boxSize -  p.getRatio() - p.getPosition().getX()) / p.getVx();
+            timeX = (boxSize -  p.getRadius() - p.getPosition().getX()) / p.getVx();
         } else if (p.getVx() < 0) {
-            timeX = (p.getRatio() - p.getPosition().getX()) / p.getVx();
+            timeX = (p.getRadius() - p.getPosition().getX()) / p.getVx();
         }
 
         if(p.getVy() > 0) {
-            timeY = (boxSize -  p.getRatio() - p.getPosition().getY()) / p.getVy();
+            timeY = (boxSize -  p.getRadius() - p.getPosition().getY()) / p.getVy();
         } else if( p.getVy() < 0) {
-            timeY = (p.getRatio() - p.getPosition().getY()) / p.getVy();
+            timeY = (p.getRadius() - p.getPosition().getY()) / p.getVy();
         }
 
         return timeX < timeY ? timeX : timeY;
