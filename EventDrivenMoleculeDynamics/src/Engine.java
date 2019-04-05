@@ -117,7 +117,7 @@ public class Engine {
    /* Las posiciones de todas las partículas deben ser al azar con distribución uniforme dentro del dominio.
     Las partículas pequeñas deben tener velocidades con una distribución uniforme en el rango: |v| < 0.1 m/s*/
 
-
+    /* STEP 1*/
     /* n = Amount of small particles*/
     private void addParticles(int n){
         Random random = new Random();
@@ -174,6 +174,17 @@ public class Engine {
             }
         }
         return false;
+    }
+
+    /* STEP 3
+     ** xi(tc) = xi(0) + vxi.tc
+     ** yi(tc) = yi(0) + vyi.tc
+     */
+    public void updatePositions (double tc){
+        for(Particle p : particles){
+            p.getPosition().setX(p.getPosition().getX() + p.getVx()*tc);
+            p.getPosition().setY(p.getPosition().getY() + p.getVy()*tc);
+        }
     }
 
 }
