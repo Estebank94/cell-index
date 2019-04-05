@@ -37,11 +37,10 @@ public class Engine {
 
         int id = 1;
 
-        double bigAngle = random.nextDouble() * 2 * Math.PI;
 
         /* create an unique big particle*/
         particles.add(new Particle(id++, 0, 0, bigRadius,
-                new Point(boxSize/2, boxSize/2), bigMass, bigAngle));
+                new Point(boxSize/2, boxSize/2), bigMass));
 
         while(particles.size() <= n){
 
@@ -50,11 +49,11 @@ public class Engine {
             double y = random.nextDouble() * (boxSize - 2*smallRadius) + smallRadius;;
 
             double v = random.nextDouble() * maxSmallVelocity;
-            double smallAngle = random.nextDouble() * 2 * Math.PI;
-            double vx = v * Math.cos(smallAngle);
-            double vy = v * Math.sin(smallAngle);
+            double angle = random.nextDouble() * 2 * Math.PI;
+            double vx = v * Math.cos(angle);
+            double vy = v * Math.sin(angle);
 
-            Particle newParticle = new Particle(id++, vx, vy, smallRadius, new Point(x, y), smallMass, smallAngle);
+            Particle newParticle = new Particle(id++, vx, vy, smallRadius, new Point(x, y), smallMass);
             if(!isSuperimposed(newParticle)){
                 /* tenemos que tener en cuenta que si no lo agregue aca, no se incremento el size del set
                 y nosotros tenemos que asegurarnos que el set tenga las n particulas, por eso es que un for

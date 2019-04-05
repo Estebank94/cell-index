@@ -7,16 +7,14 @@ public class Particle {
     private double radius;
     private Point position;
     private double mass;
-    private double angle;
 
-    public Particle(int id, double vx, double vy, double radius, Point position, double mass, double angle) {
+    public Particle(int id, double vx, double vy, double radius, Point position, double mass) {
         this.id = id;
         this.vx = vx;
         this.vy = vy;
         this.radius = radius;
         this.position = position;
         this.mass = mass;
-        this.angle = angle;
     }
 
     public int getId() {
@@ -65,14 +63,6 @@ public class Particle {
 
     public void setMass(double mass) {
         this.mass = mass;
-    }
-
-    public double getAngle() {
-        return angle;
-    }
-
-    public void setAngle(double angle) {
-        this.angle = angle;
     }
 
     @Override
