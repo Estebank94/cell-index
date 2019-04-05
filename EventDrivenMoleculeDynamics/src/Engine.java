@@ -82,11 +82,15 @@ public class Engine {
         return timeX < timeY ? timeX : timeY;
     }
 
+    /**
+     * STEP 5
+     *
+     * **/
     public void evolveCrashedParticles(Set<Particle> crashedParticles){
         Iterator<Particle> pIterator = crashedParticles.iterator();
         if(crashedParticles.size() == 1) {
             Particle p = pIterator.next();
-            if(crashedAgainstVerticalWall(crashedParticles)) {
+            if(crashedAgainstVerticalWall(p)) {
                 p.setVx(-p.getVx());
             } else {
                 p.setVy(-p.getVy());
@@ -109,8 +113,16 @@ public class Engine {
             p2.setVx(p2.getVx() - Jx / p2.getMass());
             p2.setVy(p2.getVy() - Jy / p2.getMass());
         }
+    }
 
+    public boolean crashedAgainstVerticalWall(Particle p) {
+        double DELTA = 0.000001;
 
+        if(p.getPosition().getX() - DELTA <= p.getRadius()  || p.getPosition().getX() + DELTA >= boxSize - p.getRadius()) {
+            return true;
+        }
+
+        return false;
     }
 
 
