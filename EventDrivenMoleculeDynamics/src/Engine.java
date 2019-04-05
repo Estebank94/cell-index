@@ -1,13 +1,12 @@
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
-import java.util.Iterator;
+import java.io.BufferedWriter;
+import java.util.*;
 
 public class Engine {
     private final static double INFINITE = Double.POSITIVE_INFINITY;
     private Set<Particle> particles;
+    private BufferedWriter file;
 
-    private double boxSize;
+    private double boxSize = 0.5;
     public double calculateSigma(Particle p1, Particle p2) {
         return p1.getRadius() + p2.getRadius();
     }
@@ -20,6 +19,16 @@ public class Engine {
 
     private double maxSmallVelocity = 0.1;
 
+    private int collisionCount;
+    private double time;
+
+    public Engine(int amountOfParticles) {
+        this.particles = new HashSet<>();
+        this.file = null;
+        this.collisionCount = 0;
+        this.time = 0;
+        addParticles(amountOfParticles);
+    }
 
     public Point calculateDeltaR(Particle p1, Particle p2) {
         return new Point(p2.getPosition().getX() - p1.getPosition().getX(), p2.getPosition().getY() - p1.getPosition().getY());
@@ -198,5 +207,33 @@ public class Engine {
             p.getPosition().setY(p.getPosition().getY() + p.getVy()*tc);
         }
     }
+
+    public void startEngine (int simulationTime, String path){
+        double particleCrashTc;
+        double tc = Double.POSITIVE_INFINITY;
+        Particle crashed1;
+        Particle crashed2;
+
+        for(Particle p1 : particles){
+            particleCrashTc = timeUntilCrashWithWall(p1);
+            if(particleCrashTc < tc) {
+                tc = particleCrashTc;
+                crashed1 = p1;
+                crashed2 = null;
+            }
+            for(Particle p2 : particles){
+                if(!p1.equals(p2)){
+                    particleCrashTc = timeUntilCrashWithParticle(p1, p2);
+                    if(particleCrashTc < tc ) {
+                        tc = particleCrashTc;
+                        crashed2 = p2;
+                    }
+                }
+            }
+
+        }
+    }
+
+
 
 }
