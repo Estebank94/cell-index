@@ -67,13 +67,13 @@ public class Engine {
         double d = calculateD(deltaRxdeltaV, deltaRsqr, deltaVsqr, sigma);
 
         if(deltaRxdeltaV >= 0) {
-            return INFINITE;
+            return Double.POSITIVE_INFINITY;
         }
         if(d < 0){
-            return INFINITE;
+            return Double.POSITIVE_INFINITY;
         }
 
-        return - ((deltaRxdeltaV + Math.sqrt(d))/deltaVsqr);
+        return - (deltaRxdeltaV + Math.sqrt(d))/deltaVsqr;
     }
 
     public double timeUntilCrashWithWall(Particle p) {
@@ -91,7 +91,7 @@ public class Engine {
             timeY = (p.getRadius() - p.getPosition().getY()) / p.getVy();
         }
 
-        return timeX < timeY ? timeX : timeY;
+        return (timeX < timeY) ? timeX : timeY;
     }
 
     /**
@@ -242,17 +242,19 @@ public class Engine {
                 evolveCrashedParticles(crashed1);
             }
 
+//            time = tc;
+
             time += tc;
 
             //System.out.println("tc: " + tc + " - " + pi.toString());
 //            System.out.println(particles.size() + 2);
-            System.out.println("Collision Count: " + collisionCount++ + " time: " + time);
+            System.out.println("Collision Count: " + collisionCount++ + " time: " + tc);
 //            for (Particle p : particles){
 //                System.out.println(p.getPosition().getX() + "\t" + p.getPosition().getY() + "\t" + p.getVx() + "\t" + p.getVy() + "\t" + p.getRadius() + "\t" + tc);
 //            }
 
-            String toWrite = generateFileString();
-            Engine.writeToFile(toWrite,collisionCount,path);
+//            String toWrite = generateFileString();
+//            Engine.writeToFile(toWrite,collisionCount,path);
 
             // Print two particles for Ovito animation
 //            System.out.println(0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0.001 + "\t" + 0);
