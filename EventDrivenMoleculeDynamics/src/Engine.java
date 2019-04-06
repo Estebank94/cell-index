@@ -211,13 +211,14 @@ public class Engine {
         System.out.println("Starting simulation...");
         System.out.println("Number of Particles: " + particles.size());
         double particleCrashTc;
-        double tc = Double.POSITIVE_INFINITY;
+        double tc;
         Particle crashed1 = null;
         Particle crashed2 = null;
         while( time < simulationTime ) {
+            tc = Double.POSITIVE_INFINITY;
             for(Particle p1 : particles){
                 particleCrashTc = timeUntilCrashWithWall(p1);
-                if(particleCrashTc < tc) {
+                if(particleCrashTc < tc && particleCrashTc > time) {
                     tc = particleCrashTc;
                     crashed1 = p1;
                     crashed2 = null;
@@ -225,7 +226,7 @@ public class Engine {
                 for(Particle p2 : particles){
                     if(!p1.equals(p2)){
                         particleCrashTc = timeUntilCrashWithParticle(p1, p2);
-                        if(particleCrashTc < tc ) {
+                        if(particleCrashTc < tc && particleCrashTc > time) {
                             tc = particleCrashTc;
                             crashed1 = p1;
                             crashed2 = p2;
@@ -241,8 +242,6 @@ public class Engine {
             } else {
                 evolveCrashedParticles(crashed1);
             }
-
-//            time = tc;
 
             time += tc;
 
