@@ -17,6 +17,14 @@ public class Particle {
         this.mass = mass;
     }
 
+    public Particle(double vx, double vy, double radius, Point position, double mass) {
+        this.vx = vx;
+        this.vy = vy;
+        this.radius = radius;
+        this.position = position;
+        this.mass = mass;
+    }
+
     public int getId() {
         return id;
     }

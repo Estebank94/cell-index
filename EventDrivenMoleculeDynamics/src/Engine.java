@@ -7,7 +7,7 @@ import java.util.*;
 public class Engine {
     private final static double INFINITE = Double.POSITIVE_INFINITY;
     private Set<Particle> particles;
-    private BufferedWriter file;
+    private double temperature;
 
     private double boxSize = 0.5;
     public double calculateSigma(Particle p1, Particle p2) {
@@ -25,11 +25,11 @@ public class Engine {
     private int collisionCount = 0;
     private double time = 0;
 
-    public Engine(int amountOfParticles) {
+    public Engine(int amountOfParticles, double temperature) {
         this.particles = new HashSet<>();
-        this.file = null;
         this.collisionCount = 0;
         this.time = 0;
+        this.temperature = temperature;
         addParticles(amountOfParticles);
     }
 
@@ -73,7 +73,7 @@ public class Engine {
             return Double.POSITIVE_INFINITY;
         }
 
-        return - (deltaRxdeltaV + Math.sqrt(d))/deltaVsqr;
+        return - ((deltaRxdeltaV + Math.sqrt(d))/deltaVsqr);
     }
 
     public double timeUntilCrashWithWall(Particle p) {
@@ -104,7 +104,7 @@ public class Engine {
             Point deltaV = calculateDeltaV(p1, p2);
             double deltaRxdeltaV = calculateDeltaRxDeltaV(deltaR, deltaV);
 
-            double j = (2 * p1.getMass() * p2.getMass() * deltaRxdeltaV) / sigma * (p1.getMass() + p2. getMass());
+            double j = (2 * p1.getMass() * p2.getMass() * deltaRxdeltaV) / (sigma * (p1.getMass() + p2.getMass()));
             double Jx = (j * deltaR.getX()) / sigma;
             double Jy = (j * deltaR.getY()) / sigma;
 
@@ -124,7 +124,7 @@ public class Engine {
     }
 
     public boolean crashedAgainstVerticalWall(Particle p) {
-        double DELTA = 0.000001;
+        double DELTA = 0.00000001;
 
         if(p.getPosition().getX() - DELTA <= p.getRadius()  || p.getPosition().getX() + DELTA >= boxSize - p.getRadius()) {
             return true;
@@ -153,20 +153,29 @@ public class Engine {
 
             /* Math.random() * (max - min) + min; */
             double x = random.nextDouble() * (boxSize - 2*smallRadius) + smallRadius;
-            double y = random.nextDouble() * (boxSize - 2*smallRadius) + smallRadius;;
+            double y = random.nextDouble() * (boxSize - 2*smallRadius) + smallRadius;
 
             double v = random.nextDouble() * maxSmallVelocity;
             double angle = random.nextDouble() * 2 * Math.PI;
-            double vx = v * Math.cos(angle);
-            double vy = v * Math.sin(angle);
+            double vx;
+            double vy;
 
-            Particle newParticle = new Particle(id++, vx, vy, smallRadius, new Point(x, y), smallMass);
+            if(temperature == 0) {
+                vx = v * Math.cos(angle);
+                vy = v * Math.sin(angle);
+            } else {
+                double V = temperature / n;
+                vx = v * Math.cos(angle);
+                vy = v * Math.sin(angle);
+            }
+
+            Particle newParticle = new Particle(vx, vy, smallRadius, new Point(x, y), smallMass);
             if(!isSuperimposed(newParticle)){
                 /* tenemos que tener en cuenta que si no lo agregue aca, no se incremento el size del set
                 y nosotros tenemos que asegurarnos que el set tenga las n particulas, por eso es que un for
                 comun tipo i=0; i<n, etc no nos sirve
                  */
-                particles.add(newParticle);
+                particles.add(new Particle(id++, vx, vy, smallRadius, new Point(x, y), smallMass));
             }
         }
 
@@ -210,15 +219,19 @@ public class Engine {
     public void start(int simulationTime, String path) {
         System.out.println("Starting simulation...");
         System.out.println("Number of Particles: " + particles.size());
+        long start = System.nanoTime();
         double particleCrashTc;
         double tc;
         Particle crashed1 = null;
         Particle crashed2 = null;
-        while( time < simulationTime ) {
+        while( Double.compare(time, simulationTime) < 0 ) {
+            String toWrite = generateFileString();
+            Engine.writeToFile(toWrite,collisionCount,path);
+
             tc = Double.POSITIVE_INFINITY;
             for(Particle p1 : particles){
                 particleCrashTc = timeUntilCrashWithWall(p1);
-                if(particleCrashTc < tc && particleCrashTc > time) {
+                if(particleCrashTc < tc && particleCrashTc > 0) {
                     tc = particleCrashTc;
                     crashed1 = p1;
                     crashed2 = null;
@@ -226,7 +239,7 @@ public class Engine {
                 for(Particle p2 : particles){
                     if(!p1.equals(p2)){
                         particleCrashTc = timeUntilCrashWithParticle(p1, p2);
-                        if(particleCrashTc < tc && particleCrashTc > time) {
+                        if(particleCrashTc < tc && particleCrashTc > 0)  {
                             tc = particleCrashTc;
                             crashed1 = p1;
                             crashed2 = p2;
@@ -244,21 +257,15 @@ public class Engine {
             }
 
             time += tc;
+            collisionCount++;
 
-            //System.out.println("tc: " + tc + " - " + pi.toString());
-//            System.out.println(particles.size() + 2);
-            System.out.println("Collision Count: " + collisionCount++ + " time: " + tc);
-//            for (Particle p : particles){
-//                System.out.println(p.getPosition().getX() + "\t" + p.getPosition().getY() + "\t" + p.getVx() + "\t" + p.getVy() + "\t" + p.getRadius() + "\t" + tc);
-//            }
-
-//            String toWrite = generateFileString();
-//            Engine.writeToFile(toWrite,collisionCount,path);
-
-            // Print two particles for Ovito animation
-//            System.out.println(0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0.001 + "\t" + 0);
-//            System.out.println(L + "\t" + L + "\t" + 0 + "\t" + 0 + "\t" + 0.001 + "\t" + 0);
+            System.out.println("Collision Count: " + collisionCount + " |  Collision time: " + tc);
+            System.out.println("Promedio de tiempo entre colisiones: " + time / (double) collisionCount);
+            System.out.println("Promedio de colisiones por segundo: " + ((double) collisionCount) / (time));
+            System.out.println();
         }
+
+        System.out.println("FINAL TIME" + time);
 
     }
 
@@ -273,16 +280,50 @@ public class Engine {
 
     public String generateFileString(){
         StringBuilder builder = new StringBuilder()
-                .append("//ID\t X\t Y\t Radius\t R\t G\t B\t\r\n");
+                .append(collisionCount)
+                .append("\r\n")
+                .append("//ID\t X\t Y\t Radius\t R\t G\t B\t\r\n")
+                .append(-1)
+                .append(" ")
+                .append(0)
+                .append(" ")
+                .append(0)
+                .append(" ")
+                .append(smallRadius)
+                .append("\r\n")
+                .append(-1)
+                .append(" ")
+                .append(boxSize)
+                .append(" ")
+                .append(0)
+                .append(" ")
+                .append(smallRadius)
+                .append("\r\n")
+                .append(-1)
+                .append(" ")
+                .append(0)
+                .append(" ")
+                .append(boxSize)
+                .append(" ")
+                .append(smallRadius)
+                .append("\r\n")
+                .append(-1)
+                .append(" ")
+                .append(boxSize)
+                .append(" ")
+                .append(boxSize)
+                .append(" ")
+                .append(smallRadius)
+                .append("\r\n");
         for(Particle current: particles){
-            builder.append(current.getId())
+            builder
+                    .append(current.getId())
                     .append(" ")
                     .append(current.getPosition().getX())
                     .append(" ")
                     .append(current.getPosition().getY())
                     .append(" ")
-                    .append(current.getRadius())
-                    .append("\r\n");
+                    .append(current.getRadius() + "\r\n");
         }
         return builder.toString();
     }
