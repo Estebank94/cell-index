@@ -1,272 +1,218 @@
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Engine {
-    private final static double INFINITE = Double.POSITIVE_INFINITY;
-    private Set<Particle> particles;
-    private double temperature;
+public class Engine{
 
-    private double boxSize = 0.5;
-    public double calculateSigma(Particle p1, Particle p2) {
-        return p1.getRadius() + p2.getRadius();
-    }
+    /* Small Particles */
+    private static double smallRadius = 0.005;
+    private static double smallMass = 0.1;
+    private static double smallVelocity = 0.1;
 
-    /*Radius are in meters and Mass are in grams*/
-    private double smallRadius = 0.005;
-    private double smallMass = 0.1;
-    private double bigRadius = 0.05;
-    private double bigMass = 100;
+    /* Big Particle */
+    private static double bigRadius = 0.05;
+    private static double bigMass = 100;
 
-    private double maxSmallVelocity = 0.1;
+    private static double boxSize = 0.5;
 
-    private int collisionCount = 0;
-    private double time = 0;
+    private double numberOfParticles;
+    private double time;
+    private int collisionCount;
 
-    public Engine(int amountOfParticles, double temperature) {
-        this.particles = new HashSet<>();
+    private List<Particle> particles;
+
+    public Engine(double numberOfParticles, double time) {
+        this.numberOfParticles = numberOfParticles;
+        this.time = time;
+        particles = new ArrayList<>();
         this.collisionCount = 0;
-        this.time = 0;
-        this.temperature = temperature;
-        addParticles(amountOfParticles);
+        addParticles();
     }
 
-    public Point calculateDeltaR(Particle p1, Particle p2) {
-        return new Point(p2.getPosition().getX() - p1.getPosition().getX(), p2.getPosition().getY() - p1.getPosition().getY());
-    }
+    private static double timeUntilCrashWithVerticalWall(Particle particle) {
 
-    public Point calculateDeltaV(Particle p1, Particle p2) {
-        return new Point(p2.getVx() - p1.getVx(), p2.getVy() - p2.getVy());
-    }
-
-    public double calculateDeltaSqr(Point delta) {
-        return Math.pow(delta.getX(), 2) + Math.pow(delta.getY(), 2);
-    }
-
-    public double calculateDeltaRxDeltaV(Point deltaR, Point deltaV) {
-        return deltaR.getX()*deltaV.getX() + deltaR.getY()*deltaV.getY();
-    }
-
-    public double calculateD(double deltaRxDeltaV, double deltaRsqr, double deltaVsqr, double sigma ){
-        return Math.pow(deltaRxDeltaV, 2) - deltaVsqr*(deltaRsqr - Math.pow(sigma, 2));
-    }
-
-
-    public double timeUntilCrashWithParticle(Particle p1, Particle p2) {
-        double sigma = calculateSigma(p1, p2);
-        Point deltaR = calculateDeltaR(p1, p2);
-        Point deltaV = calculateDeltaV(p1, p2);
-
-        double deltaRsqr = calculateDeltaSqr(deltaR);
-        double deltaVsqr = calculateDeltaSqr(deltaV);
-
-        double deltaRxdeltaV = calculateDeltaRxDeltaV(deltaR, deltaV);
-
-        double d = calculateD(deltaRxdeltaV, deltaRsqr, deltaVsqr, sigma);
-
-        if(deltaRxdeltaV >= 0) {
-            return Double.POSITIVE_INFINITY;
-        }
-        if(d < 0){
-            return Double.POSITIVE_INFINITY;
+        if (particle.getVx() > 0) {
+            return (boxSize - particle.getRadius() - particle.getX()) / particle.getVx();
+        } else if (particle.getVx() < 0) {
+            return (particle.getRadius() - particle.getX()) / particle.getVx();
         }
 
-        return - ((deltaRxdeltaV + Math.sqrt(d))/deltaVsqr);
+        return Double.POSITIVE_INFINITY;
     }
 
-    public double timeUntilCrashWithWall(Particle p) {
-        double timeX = Double.POSITIVE_INFINITY;
-        double timeY = Double.POSITIVE_INFINITY;
-        if(p.getVx() > 0) {
-            timeX = (boxSize -  p.getRadius() - p.getPosition().getX()) / p.getVx();
-        } else if (p.getVx() < 0) {
-            timeX = (p.getRadius() - p.getPosition().getX()) / p.getVx();
+    private static double timeUntilCrashWithHorizontalWall(Particle particle) {
+        if (particle.getVy() > 0) {
+            return  (boxSize - particle.getRadius() - particle.getY()) / particle.getVy();
+        } else if (particle.getVy() < 0) {
+            return  (particle.getRadius() - particle.getY())  / particle.getVy();
         }
 
-        if(p.getVy() > 0) {
-            timeY = (boxSize -  p.getRadius() - p.getPosition().getY()) / p.getVy();
-        } else if( p.getVy() < 0) {
-            timeY = (p.getRadius() - p.getPosition().getY()) / p.getVy();
+        return Double.POSITIVE_INFINITY;
+    }
+
+    private static double timeUntilCrashWithAnotherParticle(Particle p1, Particle p2) {
+        double dX = p2.getX() - p1.getX();
+        double dY = p2.getY() - p1.getY();
+        double dVx = p2.getVx() - p1.getVx();
+        double dVy = p2.getVy() - p1.getVy();
+
+        double dVdR = dVx*dX + dVy*dY;
+        double dVdV = Math.pow(dVx, 2) + Math.pow(dVy, 2);
+        double dRdR = Math.pow(dX, 2) + Math.pow(dY, 2);
+        double sigma = p1.getRadius() + p2.getRadius();
+
+        double d = Math.pow(dVdR, 2) - dVdV * (dRdR - Math.pow(sigma ,2));
+
+        if (dVdR < 0 && d >= 0) {
+            return -((dVdR + Math.sqrt(d)) / dVdV);
         }
 
-        return (timeX < timeY) ? timeX : timeY;
-    }
-
-    /**
-     * STEP 5
-     *
-     * **/
-    public void evolveCrashedParticles(Particle p1, Particle p2){
-            double sigma = calculateSigma(p1, p2);
-            Point deltaR = calculateDeltaR(p1, p2);
-            Point deltaV = calculateDeltaV(p1, p2);
-            double deltaRxdeltaV = calculateDeltaRxDeltaV(deltaR, deltaV);
-
-            double j = (2 * p1.getMass() * p2.getMass() * deltaRxdeltaV) / (sigma * (p1.getMass() + p2.getMass()));
-            double Jx = (j * deltaR.getX()) / sigma;
-            double Jy = (j * deltaR.getY()) / sigma;
-
-            p1.setVx(p1.getVx() + Jx / p1.getMass());
-            p1.setVy(p1.getVy() + Jy / p1.getMass());
-            p2.setVx(p2.getVx() - Jx / p2.getMass());
-            p2.setVy(p2.getVy() - Jy / p2.getMass());
+        return Double.POSITIVE_INFINITY;
     }
 
 
-    public void evolveCrashedParticles(Particle p){
-        if(crashedAgainstVerticalWall(p)) {
-            p.setVx(-p.getVx());
-        } else {
-            p.setVy(-p.getVy());
-        }
-    }
+    private static void evolveCrashedParticles(Particle p1, Particle p2, boolean verticalCollision, boolean horizontalCollision) {
 
-    public boolean crashedAgainstVerticalWall(Particle p) {
-        double DELTA = 0.00000001;
-
-        if(p.getPosition().getX() - DELTA <= p.getRadius()  || p.getPosition().getX() + DELTA >= boxSize - p.getRadius()) {
-            return true;
+        if (verticalCollision) {
+            p1.setVx(-p1.getVx());
+            return;
         }
 
-        return false;
+        if (horizontalCollision) {
+            p1.setVy(-p1.getVy());
+            return;
+        }
+
+        if (!verticalCollision && !horizontalCollision){
+
+            double dX = p2.getX() - p1.getX();
+            double dY = p2.getY() - p1.getY();
+            double dVx = p2.getVx() - p1.getVx();
+            double dVy = p2.getVy() - p1.getVy();
+
+            double dVdR = dVx*dX + dVy*dY;
+            double sigma = p1.getRadius() + p2.getRadius();
+
+            double J = (2 * p1.getMass() * p2.getMass() * dVdR) / (sigma * (p1.getMass() + p2.getMass()));
+            double Jx = J * dX / sigma;
+            double Jy = J * dY / sigma;
+
+            p1.setVx(p1.getVx() + Jx/p1.getMass());
+            p1.setVy(p1.getVy() + Jy/p1.getMass());
+
+            p2.setVx(p2.getVx() - Jx/p2.getMass());
+            p2.setVy(p2.getVy() - Jy/p2.getMass());
+        }
+
     }
 
+    public List<Particle> addParticles() {
 
-   /* Las posiciones de todas las partículas deben ser al azar con distribución uniforme dentro del dominio.
-    Las partículas pequeñas deben tener velocidades con una distribución uniforme en el rango: |v| < 0.1 m/s*/
+        /* Add big particle */
+        particles.add(new Particle(1, boxSize / 2, boxSize / 2, 0, 0, bigMass, bigRadius));
 
-    /* STEP 1*/
-    /* n = Amount of small particles*/
-    private void addParticles(int n){
-        Random random = new Random();
+        /* Add small particles */
+        for (int i = 0; i < numberOfParticles; i++){
 
-        int id = 1;
+            double x;
+            double y;
 
-
-        /* create an unique big particle*/
-        particles.add(new Particle(id++, 0, 0, bigRadius,
-                new Point(boxSize/2, boxSize/2), bigMass));
-
-        while(particles.size() <= n){
-
-            /* Math.random() * (max - min) + min; */
-            double x = random.nextDouble() * (boxSize - 2*smallRadius) + smallRadius;
-            double y = random.nextDouble() * (boxSize - 2*smallRadius) + smallRadius;
-
-            double v = random.nextDouble() * maxSmallVelocity;
-            double angle = random.nextDouble() * 2 * Math.PI;
-            double vx;
-            double vy;
-
-            if(temperature == 0) {
-                vx = v * Math.cos(angle);
-                vy = v * Math.sin(angle);
-            } else {
-                double V = temperature / n;
-                vx = v * Math.cos(angle);
-                vy = v * Math.sin(angle);
+            do {
+                x = smallRadius + (boxSize - 2 * smallRadius) * Math.random();
+                y = smallRadius + (boxSize - 2 * smallRadius) * Math.random();
             }
+            while (isSuperimposed(x,y, particles));
 
-            Particle newParticle = new Particle(vx, vy, smallRadius, new Point(x, y), smallMass);
-            if(!isSuperimposed(newParticle)){
-                /* tenemos que tener en cuenta que si no lo agregue aca, no se incremento el size del set
-                y nosotros tenemos que asegurarnos que el set tenga las n particulas, por eso es que un for
-                comun tipo i=0; i<n, etc no nos sirve
-                 */
-                particles.add(new Particle(id++, vx, vy, smallRadius, new Point(x, y), smallMass));
-            }
+            double vx = 2 * smallVelocity * Math.random() - smallVelocity;
+            double vy = 2 * smallVelocity * Math.random() - smallVelocity;
+
+            particles.add(new Particle(i+2, x, y, vx, vy, smallMass, smallRadius));
         }
 
-
+        return particles;
     }
 
+    private static boolean isSuperimposed(double x, double y, List<Particle> particles) {
 
-    /*Cada particula nueva (i) no se puede superponer con ninguna
-    de las particulas ya existentes (j) ni con las paredes
-    (xi − xj)^2 +(yi − yj)^2 > (Ri − Rj)^2 */
-
-    public boolean isSuperimposed (Particle newParticle) {
-
-        double xDifference;
-        double yDifference;
-        double rSum;
-
-        for(Particle p : particles){
-            xDifference = (newParticle.getPosition().getX() - p.getPosition().getX());
-            yDifference = (newParticle.getPosition().getY() - p.getPosition().getY());
-            rSum = (newParticle.getRadius() + p.getRadius());
-
-            if(Math.pow(xDifference,2) + Math.pow(yDifference, 2) <= Math.pow(rSum,2)) {
+        for (Particle p: particles){
+            boolean superImposed = Math.pow(p.getX() - x, 2) + Math.pow(p.getY() - y, 2) <= Math.pow(p.getRadius() + smallRadius, 2);
+            if (superImposed){
                 return true;
             }
         }
         return false;
     }
 
-    /* STEP 3
-     ** xi(tc) = xi(0) + vxi.tc
-     ** yi(tc) = yi(0) + vyi.tc
-     */
-    public void updatePositions (double tc){
-        for(Particle p : particles){
-            p.getPosition().setX(p.getPosition().getX() + p.getVx()*tc);
-            p.getPosition().setY(p.getPosition().getY() + p.getVy()*tc);
+    private static void updatePositions(List<Particle> particles, double tc) {
+        for (Particle particle : particles){
+            particle.setX(particle.getX() + particle.getVx() * tc);
+            particle.setY(particle.getY() + particle.getVy() * tc);
         }
     }
 
-    public void start(int simulationTime, String path) {
-        System.out.println("Starting simulation...");
-        System.out.println("Number of Particles: " + particles.size());
-        long start = System.nanoTime();
-        double particleCrashTc;
-        double tc;
-        Particle crashed1 = null;
-        Particle crashed2 = null;
-        while( Double.compare(time, simulationTime) < 0 ) {
-            String toWrite = generateFileString();
-            Engine.writeToFile(toWrite,collisionCount,path);
+    public void start(String path) {
+        double t = 0;
 
-            tc = Double.POSITIVE_INFINITY;
-            for(Particle p1 : particles){
-                particleCrashTc = timeUntilCrashWithWall(p1);
-                if(particleCrashTc < tc && particleCrashTc > 0) {
-                    tc = particleCrashTc;
+        while(t < time ){
+            double tc = Double.POSITIVE_INFINITY;
+            Particle crashed1 = null;
+            Particle crashed2 = null;
+            boolean verticalCollision = false;
+            boolean horizontalCollision = false;
+
+            for (Particle p1 : particles){
+                /* Checking wall collision */
+                double verticalTc = timeUntilCrashWithVerticalWall(p1);
+                double horizontalTc = timeUntilCrashWithHorizontalWall(p1);
+
+                if (verticalTc < tc){
+                    tc = verticalTc;
+                    verticalCollision = true;
+                    horizontalCollision = false;
                     crashed1 = p1;
                     crashed2 = null;
                 }
-                for(Particle p2 : particles){
-                    if(!p1.equals(p2)){
-                        particleCrashTc = timeUntilCrashWithParticle(p1, p2);
-                        if(particleCrashTc < tc && particleCrashTc > 0)  {
-                            tc = particleCrashTc;
+
+                if (horizontalTc < tc) {
+                    tc = horizontalTc;
+                    verticalCollision = false;
+                    horizontalCollision = true;
+                    crashed1 = p1;
+                    crashed2 = null;
+                }
+
+                /* Checking particle collision */
+                for (Particle p2 : particles){
+                    if (!p1.equals(p2.getId())){
+
+                        double ptc = timeUntilCrashWithAnotherParticle(p1, p2);
+                        if (ptc < tc){
+                            tc = ptc;
+                            verticalCollision = false;
+                            horizontalCollision = false;
                             crashed1 = p1;
                             crashed2 = p2;
                         }
                     }
                 }
-
             }
 
-            updatePositions(tc);
-            if(crashed2 != null) {
-                evolveCrashedParticles(crashed1, crashed2);
-            } else {
-                evolveCrashedParticles(crashed1);
-            }
+            updatePositions(particles, tc);
 
-            time += tc;
-            collisionCount++;
+            evolveCrashedParticles(crashed1, crashed2, verticalCollision, horizontalCollision);
 
-            System.out.println("Collision Count: " + collisionCount + " |  Collision time: " + tc);
-            System.out.println("Promedio de tiempo entre colisiones: " + time / (double) collisionCount);
-            System.out.println("Promedio de colisiones por segundo: " + ((double) collisionCount) / (time));
+            t += tc;
+
+            String toWrite = generateFileString();
+            Engine.writeToFile(toWrite,collisionCount, path);
+            
+            System.out.println("Collision Count: " + collisionCount++ + " |  Collision time: " + tc);
+            System.out.println("Promedio de tiempo entre colisiones: " + t / (double) collisionCount);
+            System.out.println("Promedio de colisiones por segundo: " + ((double) collisionCount) / (t));
             System.out.println();
         }
-
-        System.out.println("FINAL TIME" + time);
-
     }
 
     public static void writeToFile(String data, int index, String path){
@@ -319,15 +265,12 @@ public class Engine {
             builder
                     .append(current.getId())
                     .append(" ")
-                    .append(current.getPosition().getX())
+                    .append(current.getX())
                     .append(" ")
-                    .append(current.getPosition().getY())
+                    .append(current.getY())
                     .append(" ")
                     .append(current.getRadius() + "\r\n");
         }
         return builder.toString();
     }
-
-
-
 }
