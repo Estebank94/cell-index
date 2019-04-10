@@ -1,8 +1,13 @@
 import java.io.IOException;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Time;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Engine{
 
@@ -20,8 +25,18 @@ public class Engine{
     private double numberOfParticles;
     private double time;
     private int collisionCount;
+    private double temperature;
 
     private List<Particle> particles;
+
+    public Engine(double numberOfParticles, double time, double temperature) {
+        this.numberOfParticles = numberOfParticles;
+        this.time = time;
+        particles = new ArrayList<>();
+        this.collisionCount = 0;
+        this.temperature = temperature;
+        addParticles();
+    }
 
     public Engine(double numberOfParticles, double time) {
         this.numberOfParticles = numberOfParticles;
@@ -108,6 +123,7 @@ public class Engine{
 
     }
 
+
     public List<Particle> addParticles() {
 
         /* Add big particle */
@@ -125,13 +141,35 @@ public class Engine{
             }
             while (isSuperimposed(x,y, particles));
 
-            double vx = 2 * smallVelocity * Math.random() - smallVelocity;
-            double vy = 2 * smallVelocity * Math.random() - smallVelocity;
+            double vx;
+            double vy;
+
+//            if(temperature == 0){
+//                vx = randomSpeed();
+//                vy = randomSpeed();
+//            }else {
+//                double v = temperature/numberOfParticles;
+//                vx = v/Math.sqrt(2);
+//                vy = v/Math.sqrt(2);
+//
+//                double sign = Math.random();
+//                if(sign > 0.5){
+//                    vx = vx * (-1);
+//                }else if(sign < 0.5){
+//                    vy = vy * (-1);
+//                }
+//            }
+            vx = 2 * smallVelocity * Math.random() - smallVelocity;
+            vy = 2 * smallVelocity * Math.random() - smallVelocity;
 
             particles.add(new Particle(i+2, x, y, vx, vy, smallMass, smallRadius));
         }
 
         return particles;
+    }
+
+    private static double randomSpeed(){
+        return  2 * smallVelocity * Math.random() - smallVelocity;
     }
 
     private static boolean isSuperimposed(double x, double y, List<Particle> particles) {
@@ -154,8 +192,14 @@ public class Engine{
 
     public void start(String path) {
         double t = 0;
+        int seconds = 0;
+        int prevSeconds = 0;
+        Map<Integer, Integer> timerMap = new HashMap<>();
+        int count = 0;
+        int countBySecond = 0;
+        List<Point> bigMovement = new ArrayList<>();
 
-        while(t < time ){
+        while(t < time){
             double tc = Double.POSITIVE_INFINITY;
             Particle crashed1 = null;
             Particle crashed2 = null;
@@ -199,20 +243,42 @@ public class Engine{
                 }
             }
 
+
+            bigMovement.add(new Point(particles.get(0).getX(), particles.get(0).getY()));
             updatePositions(particles, tc);
 
             evolveCrashedParticles(crashed1, crashed2, verticalCollision, horizontalCollision);
 
             t += tc;
 
+            seconds = (int)t;
+            countBySecond++;
+            if(prevSeconds < seconds){
+                timerMap.put(prevSeconds, countBySecond);
+                prevSeconds = seconds;
+                countBySecond = 0;
+            }
+
+
             String toWrite = generateFileString();
             Engine.writeToFile(toWrite,collisionCount, path);
-            
+
+            System.out.println("Tiempo:" + t);
             System.out.println("Collision Count: " + collisionCount++ + " |  Collision time: " + tc);
             System.out.println("Promedio de tiempo entre colisiones: " + t / (double) collisionCount);
             System.out.println("Promedio de colisiones por segundo: " + ((double) collisionCount) / (t));
             System.out.println();
         }
+        /* collisions per second */
+        for(int mapTime : timerMap.keySet()){
+            System.out.println(mapTime + " " + timerMap.get(mapTime));
+        }
+
+        /* big particle movement */
+        for(Point movement : bigMovement){
+            System.out.println(movement.getX() + " " + movement.getY());
+        }
+
     }
 
     public static void writeToFile(String data, int index, String path){
