@@ -5,6 +5,7 @@ import java.nio.file.Paths;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -193,6 +194,8 @@ public class Engine{
 
     public void start(String path) {
         double t = 0;
+        Integer[] counter = new Integer[]{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+        while(t < time ){
         int seconds = 0;
         int prevSeconds = 0;
         Map<Integer, Integer> timerMap = new HashMap<>();
@@ -268,11 +271,13 @@ public class Engine{
 
             String toWrite = generateFileString(particles);
             Engine.writeToFile(toWrite,collisionCount, path);
+            counter[Double.valueOf(String.valueOf(tc * 200)).intValue()]++;
 
 
             System.out.println("Collision Count: " + collisionCount++ + " |  Collision time: " + tc);
             System.out.println("Promedio de tiempo entre colisiones: " + (t / (double) collisionCount));
-            System.out.println("Promedio de colisiones por segundo: " + ((double) collisionCount) / (t));
+            System.out.println("Promedio de colisiones por segundo: " + (double) collisionCount / t);
+            System.out.println(Arrays.toString(counter));
             System.out.println();
         }
         /* collisions per second */
@@ -296,7 +301,7 @@ public class Engine{
     }
 
 
-    public static String generateFileString(List<Particle> particles){
+    public static String generateFileString(List<Particle> particles) {
         StringBuilder builder = new StringBuilder()
                 .append(particles.size())
                 .append("\r\n")
@@ -305,7 +310,7 @@ public class Engine{
                 .append("-1\t 0\t 0.5\t 0.005\t\r\n")
                 .append("-1\t 0.5\t 0\t 0.005\t\r\n")
                 .append("-1\t 0.5\t 0.5\t 0.005\t\r\n");
-        for(Particle current: particles){
+        for(Particle current: particles) {
             builder.append(current.getId())
                     .append(" ")
                     .append(current.getX())
@@ -316,62 +321,4 @@ public class Engine{
         }
         return builder.toString();
     }
-
-
-//    public String generateFileString(){
-//        StringBuilder builder = new StringBuilder()
-//                .append(collisionCount)
-//                .append("\r\n")
-//                .append("//ID\t X\t Y\t Radius\t R\t G\t B\t\r\n")
-//                .append(-1)
-//                .append(" ")
-//                .append(0)
-//                .append(" ")
-//                .append(0)
-//                .append(" ")
-//                .append(smallRadius)
-//                .append("\r\n")
-//                .append(-1)
-//                .append(" ")
-//                .append(boxSize)
-//                .append(" ")
-//                .append(0)
-//                .append(" ")
-//                .append(smallRadius)
-//                .append("\r\n")
-//                .append(-1)
-//                .append(" ")
-//                .append(0)
-//                .append(" ")
-//                .append(boxSize)
-//                .append(" ")
-//                .append(smallRadius)
-//                .append("\r\n")
-//                .append(-1)
-//                .append(" ")
-//                .append(boxSize)
-//                .append(" ")
-//                .append(boxSize)
-//                .append(" ")
-//                .append(smallRadius)
-//                .append("\r\n");
-//        for(Particle current: particles){
-//            builder
-//                    .append(current.getId())
-//                    .append(" ")
-//                    .append(current.getX())
-//                    .append(" ")
-//                    .append(current.getY())
-//                    .append(" ");
-//
-//
-//            if(current.getId() < numberOfParticles + 1) {
-//                builder.append(current.getRadius() + "\r\n");
-//            } else {
-//                builder.append(current.getRadius());
-//            }
-//
-//        }
-//        return builder.toString();
-//    }
 }
