@@ -195,101 +195,99 @@ public class Engine{
     public void start(String path) {
         double t = 0;
         Integer[] counter = new Integer[]{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-        while(t < time ){
-        int seconds = 0;
-        int prevSeconds = 0;
-        Map<Integer, Integer> timerMap = new HashMap<>();
-        int count = 0;
-        int countBySecond = 0;
-        List<Point> bigMovement = new ArrayList<>();
+        while(t < time ) {
+            int seconds = 0;
+            int prevSeconds = 0;
+            Map<Integer, Integer> timerMap = new HashMap<>();
+            int count = 0;
+            int countBySecond = 0;
+            List<Point> bigMovement = new ArrayList<>();
 
-        while(t < time){
-            double tc = Double.POSITIVE_INFINITY;
-            Particle crashed1 = null;
-            Particle crashed2 = null;
-            boolean verticalCollision = false;
-            boolean horizontalCollision = false;
+            while (t < time) {
+                double tc = Double.POSITIVE_INFINITY;
+                Particle crashed1 = null;
+                Particle crashed2 = null;
+                boolean verticalCollision = false;
+                boolean horizontalCollision = false;
 
-            for (Particle p1 : particles){
+                for (Particle p1 : particles) {
                 /* Checking wall collision */
-                double verticalTc = timeUntilCrashWithVerticalWall(p1);
-                double horizontalTc = timeUntilCrashWithHorizontalWall(p1);
+                    double verticalTc = timeUntilCrashWithVerticalWall(p1);
+                    double horizontalTc = timeUntilCrashWithHorizontalWall(p1);
 
-                if (verticalTc < tc){
-                    tc = verticalTc;
-                    verticalCollision = true;
-                    horizontalCollision = false;
-                    crashed1 = p1;
-                    crashed2 = null;
-                }
+                    if (verticalTc < tc) {
+                        tc = verticalTc;
+                        verticalCollision = true;
+                        horizontalCollision = false;
+                        crashed1 = p1;
+                        crashed2 = null;
+                    }
 
-                if (horizontalTc < tc) {
-                    tc = horizontalTc;
-                    verticalCollision = false;
-                    horizontalCollision = true;
-                    crashed1 = p1;
-                    crashed2 = null;
-                }
+                    if (horizontalTc < tc) {
+                        tc = horizontalTc;
+                        verticalCollision = false;
+                        horizontalCollision = true;
+                        crashed1 = p1;
+                        crashed2 = null;
+                    }
 
                 /* Checking particle collision */
-                for (Particle p2 : particles){
-                    if (!p1.equals(p2.getId())){
+                    for (Particle p2 : particles) {
+                        if (!p1.equals(p2.getId())) {
 
-                        double ptc = timeUntilCrashWithAnotherParticle(p1, p2);
-                        if (ptc < tc){
-                            tc = ptc;
-                            verticalCollision = false;
-                            horizontalCollision = false;
-                            crashed1 = p1;
-                            crashed2 = p2;
+                            double ptc = timeUntilCrashWithAnotherParticle(p1, p2);
+                            if (ptc < tc) {
+                                tc = ptc;
+                                verticalCollision = false;
+                                horizontalCollision = false;
+                                crashed1 = p1;
+                                crashed2 = p2;
+                            }
                         }
                     }
                 }
+
+
+                bigMovement.add(new Point(particles.get(0).getX(), particles.get(0).getY()));
+                updatePositions(particles, tc);
+
+                evolveCrashedParticles(crashed1, crashed2, verticalCollision, horizontalCollision);
+
+                t += tc;
+
+
+                seconds = (int) t;
+                countBySecond++;
+                if (prevSeconds < seconds) {
+                    timerMap.put(prevSeconds, countBySecond);
+                    prevSeconds = seconds;
+                    countBySecond = 0;
+                }
+
+
+                System.out.println("Tiempo:" + t);
+
+                String toWrite = generateFileString(particles);
+                Engine.writeToFile(toWrite, collisionCount, path);
+                counter[Double.valueOf(String.valueOf(tc * 200)).intValue()]++;
+
+
+                System.out.println("Collision Count: " + collisionCount++ + " |  Collision time: " + tc);
+                System.out.println("Promedio de tiempo entre colisiones: " + (t / (double) collisionCount));
+                System.out.println("Promedio de colisiones por segundo: " + (double) collisionCount / t);
+                System.out.println(Arrays.toString(counter));
+                System.out.println();
             }
-
-
-            bigMovement.add(new Point(particles.get(0).getX(), particles.get(0).getY()));
-            updatePositions(particles, tc);
-
-            evolveCrashedParticles(crashed1, crashed2, verticalCollision, horizontalCollision);
-
-            t += tc;
-
-
-            seconds = (int)t;
-            countBySecond++;
-            if(prevSeconds < seconds){
-                timerMap.put(prevSeconds, countBySecond);
-                prevSeconds = seconds;
-                countBySecond = 0;
-            }
-
-
-
-
-            System.out.println("Tiempo:" + t);
-
-            String toWrite = generateFileString(particles);
-            Engine.writeToFile(toWrite,collisionCount, path);
-            counter[Double.valueOf(String.valueOf(tc * 200)).intValue()]++;
-
-
-            System.out.println("Collision Count: " + collisionCount++ + " |  Collision time: " + tc);
-            System.out.println("Promedio de tiempo entre colisiones: " + (t / (double) collisionCount));
-            System.out.println("Promedio de colisiones por segundo: " + (double) collisionCount / t);
-            System.out.println(Arrays.toString(counter));
-            System.out.println();
-        }
         /* collisions per second */
-        for(int mapTime : timerMap.keySet()){
-            System.out.println(mapTime + " " + timerMap.get(mapTime));
-        }
+            for (int mapTime : timerMap.keySet()) {
+                System.out.println(mapTime + " " + timerMap.get(mapTime));
+            }
 
         /* big particle movement */
-        for(Point movement : bigMovement){
-            System.out.println(movement.getX() + " " + movement.getY());
+            for (Point movement : bigMovement) {
+                System.out.println(movement.getX() + " " + movement.getY());
+            }
         }
-
     }
 
     public static void writeToFile(String data, int index, String path){
