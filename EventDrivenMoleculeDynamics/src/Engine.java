@@ -145,23 +145,23 @@ public class Engine{
             double vx;
             double vy;
 
-//            if(temperature == 0){
-//                vx = randomSpeed();
-//                vy = randomSpeed();
-//            }else {
-//                double v = temperature/numberOfParticles;
-//                vx = v/Math.sqrt(2);
-//                vy = v/Math.sqrt(2);
-//
-//                double sign = Math.random();
-//                if(sign > 0.5){
-//                    vx = vx * (-1);
-//                }else if(sign < 0.5){
-//                    vy = vy * (-1);
-//                }
-//            }
-            vx = 2 * smallVelocity * Math.random() - smallVelocity;
-            vy = 2 * smallVelocity * Math.random() - smallVelocity;
+            if(temperature == 0){
+                vx = randomSpeed();
+                vy = randomSpeed();
+            }else {
+                double v = temperature/numberOfParticles;
+                vx = v/Math.sqrt(2);
+                vy = v/Math.sqrt(2);
+
+                double sign = Math.random();
+                if(sign > 0.5){
+                    vx = vx * (-1);
+                }else if(sign < 0.5){
+                    vy = vy * (-1);
+                }
+            }
+//            vx = 2 * smallVelocity * Math.random() - smallVelocity;
+//            vy = 2 * smallVelocity * Math.random() - smallVelocity;
 
             particles.add(new Particle(i+2, x, y, vx, vy, smallMass, smallRadius));
         }
@@ -266,8 +266,8 @@ public class Engine{
 
             System.out.println("Tiempo:" + t);
 
-            String toWrite = generateFileString(particles);
-            Engine.writeToFile(toWrite,collisionCount, path);
+//            String toWrite = generateFileString(particles);
+//            Engine.writeToFile(toWrite,collisionCount, path);
 
 
             System.out.println("Collision Count: " + collisionCount++ + " |  Collision time: " + tc);
@@ -280,10 +280,13 @@ public class Engine{
             System.out.println(mapTime + " " + timerMap.get(mapTime));
         }
 
+        String writeToMovementFile = generateMovementString(bigMovement);
+        Engine.writeToMovementFile(writeToMovementFile, path);
+
         /* big particle movement */
-        for(Point movement : bigMovement){
-            System.out.println(movement.getX() + " " + movement.getY());
-        }
+//        for(Point movement : bigMovement){
+//            System.out.println(movement.getX() + " " + movement.getY());
+//        }
 
     }
 
@@ -315,6 +318,28 @@ public class Engine{
                     .append(current.getRadius()+"\r\n");
         }
         return builder.toString();
+    }
+
+
+    public static String generateMovementString(List<Point> bigMovement){
+        StringBuilder builder = new StringBuilder()
+                .append("x y")
+                .append("\r\n");
+        for(Point movement : bigMovement){
+            builder.append(movement.getX())
+                    .append(" ")
+                    .append(movement.getY())
+                    .append("\r\n");
+        }
+        return builder.toString();
+    }
+
+    public static void writeToMovementFile(String data, String path){
+        try {
+            Files.write(Paths.get(path  + "/bigMovement" + ".txt"), data.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
