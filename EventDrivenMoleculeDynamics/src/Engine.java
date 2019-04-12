@@ -60,6 +60,7 @@ public class Engine{
         return Double.POSITIVE_INFINITY;
     }
 
+    /* time until a particle crashes with an horizontal wall*/
     private static double timeUntilCrashWithHorizontalWall(Particle particle) {
         if (particle.getVy() > 0) {
             return  (boxSize - particle.getRadius() - particle.getY()) / particle.getVy();
