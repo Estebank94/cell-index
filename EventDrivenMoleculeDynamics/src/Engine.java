@@ -2,8 +2,6 @@ import java.io.IOException;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
-import java.text.DecimalFormat;
 import java.util.*;
 
 
@@ -252,7 +250,7 @@ public class Engine{
 
                 /*  (X,Y) movement of the big particle -> future use: MSD calculation */
                 seconds = (int) t;
-                if(seconds % 10 == 0){
+                if(seconds % 5 == 0){
                     if(!gotIt.containsKey(seconds)){
 
                         Point current = new Point(particles.get(0).getX(), particles.get(0).getY());
@@ -300,12 +298,11 @@ public class Engine{
         String writeToXYMovementFile = generateXYMovementString(gotIt);
         Engine.writeToXYMovementFile(writeToXYMovementFile, path);
 
-        for(int i = 0; i*10<=290; i++){
-            MSDCalculator(i*10, gotIt);
+        List<Double> MSDs = new ArrayList<>();
+        for(int i = 0; i*5<=1995; i++){
+            double MSDValue = MSDCalculator(i*5, gotIt);
+            MSDs.add(MSDValue);
         }
-
-        //public boolean replace(K key, V oldValue, V newValue)
-
 
 
     }
@@ -409,7 +406,7 @@ public class Engine{
         return builder.toString();
     }
 
-    public static void MSDCalculator (int tau, Map<Integer, Point> gotIt){
+    public static double MSDCalculator (int tau, Map<Integer, Point> gotIt){
 
         double MSDx = 0;
         double MSDy = 0;
@@ -417,23 +414,33 @@ public class Engine{
         int count = 0;
 
         for(Integer seconds : gotIt.keySet()){
-            if(seconds + tau <= 290){
+            if(seconds + tau <= 1995){
                 MSDx += Math.pow(gotIt.get(seconds+tau).getX() - gotIt.get(seconds).getX(),2);
                 MSDy += Math.pow(gotIt.get(seconds+tau).getY() - gotIt.get(seconds).getY(),2);
                 count++;
             }
         }
-        MSDx /= count;
-        MSDy /= count;
+//        MSDx /= count;
+//        MSDy /= count;
 
         double MSDz;
-        MSDz = Math.sqrt(Math.pow(MSDx,2) + Math.pow(MSDy,2));
+        MSDz = Math.sqrt(Math.pow(MSDx,2) + Math.pow(MSDy,2))/count;
+        System.out.println(MSDz);
 
-//        System.out.println("MSDx: " + MSDx);
-//        System.out.println("MSDy: " + MSDy);
-//        System.out.println("for Tau: " + tau + " MSDz:" + MSDz + " counted: " + count);
-          System.out.println(MSDz);
+        return MSDz;
+    }
 
+    public static double errorCalculator (List<Double> MSDs, int gradient){
+
+        double error = 0;
+
+        for(double m : MSDs){
+            for(int i = 0; i*5<=95; i++){
+                error += Math.pow(m-(gradient*i*5),2);
+            }
+        }
+
+        return error;
     }
 
 
