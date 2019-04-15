@@ -4,12 +4,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
+import java.util.*;
 
 
 public class Engine{
@@ -207,10 +202,10 @@ public class Engine{
         List<Point> bigMovement = new ArrayList<>();
 
         /* Calculate Diffusion */
-        Map<Integer, Double> gotIt = new HashMap<>();
-        Map<Integer, Double> printDiffusion = new HashMap<>();
-        /* z(0) */
-        double initialZ = (Math.pow(particles.get(0).getX(),2) + Math.pow(particles.get(0).getY(),2));
+        Map<Integer, Point> gotIt = new TreeMap<>();
+
+        /* (x(0), y(0)) */
+        Point initialPosition = new Point (particles.get(0).getX(), particles.get(0).getY());
 
         while (t < time) {
             double tc = Double.POSITIVE_INFINITY;
@@ -255,40 +250,21 @@ public class Engine{
                     }
                 }
 
-                /*  Diffusion Value */
+                /*  (X,Y) movement of the big particle -> future use: MSD calculation */
                 seconds = (int) t;
                 if(seconds % 10 == 0){
                     if(!gotIt.containsKey(seconds)){
 
                         Point current = new Point(particles.get(0).getX(), particles.get(0).getY());
 
-                        /* z(t) = (x(t)^2 + y(t)^2)1/2 */
-                        double z = Math.sqrt(Math.pow(current.getX(), 2) + Math.pow(current.getY(),2));
-
                         if(seconds!=0){
-                            /* (t, z(t)) */
-                            gotIt.put(seconds, z);
-
-                            /* <z(t) - z(0)>^2 */
-                            double mean = 0;
-                            double difference;
-
-
-                            /* sum = Sum(1,N) of (xj - xi)^2 + (yj - yi)^2 */
-                            for(Integer i : gotIt.keySet()){
-                                difference = Math.pow((gotIt.get(i) - initialZ),2);
-                                mean += difference;
-                            }
-
-                            /* sum(1/N) */
-                            mean /= (gotIt.size() - 1);
-                            double diffusionValue = mean / 2*seconds;
-
-                            printDiffusion.put(seconds, diffusionValue);
-//                            System.out.println("Time: " + seconds + " DiffusionValue: " + diffusionValue);
+                            /* (t, (x,y)) */
+                            gotIt.put(seconds, current);
+                            System.out.println("Time: " + seconds + " Point: " + current);
 
                         }else {
-                            gotIt.put(seconds, 0.0);
+                            gotIt.put(seconds, initialPosition);
+                            System.out.println("Time: " + seconds + " Point: " + initialPosition);
                         }
                     }
                 }
@@ -305,28 +281,32 @@ public class Engine{
 //            String toWrite = generateFileString(particles);
 //            Engine.writeToFile(toWrite,collisionCount, path);
 
-            System.out.println("Collision Count: " + collisionCount++ + " |  Collision time: " + tc);
-            System.out.println("Promedio de tiempo entre colisiones: " + (t / (double) collisionCount));
-            System.out.println("Promedio de colisiones por segundo: " + ((double) collisionCount) / (t));
-            System.out.println();
+//            System.out.println("Collision Count: " + collisionCount++ + " |  Collision time: " + tc);
+//            System.out.println("Promedio de tiempo entre colisiones: " + (t / (double) collisionCount));
+//            System.out.println("Promedio de colisiones por segundo: " + ((double) collisionCount) / (t));
+//            System.out.println();
         }
 
         /* Collisions per second */
-            for (int mapTime : timerMap.keySet()) {
-                System.out.println(mapTime + " " + timerMap.get(mapTime));
-            }
+//            for (int mapTime : timerMap.keySet()) {
+//                System.out.println(mapTime + " " + timerMap.get(mapTime));
+//            }
 
         /* Big Particle movement */
-            for (Point movement : bigMovement) {
-                System.out.println(movement.getX() + " " + movement.getY());
-            }
-
         String writeToMovementFile = generateMovementString(bigMovement);
         Engine.writeToMovementFile(writeToMovementFile, path);
 
-        /* Diffusion file */
-        String writeToDiffusionFile = generateDiffusionString(printDiffusion);
-        Engine.writeToDiffusionFile(writeToDiffusionFile, path);
+        /* Big Particle movement for MSD */
+        String writeToXYMovementFile = generateXYMovementString(gotIt);
+        Engine.writeToXYMovementFile(writeToXYMovementFile, path);
+
+        for(int i = 0; i*10<=290; i++){
+            MSDCalculator(i*10, gotIt);
+        }
+
+        //public boolean replace(K key, V oldValue, V newValue)
+
+
 
     }
 
@@ -375,18 +355,22 @@ public class Engine{
         return builder.toString();
     }
 
-    public static String generateDiffusionString(Map<Integer, Double> diffusionMap){
+
+    public static String generateXYMovementString(Map<Integer, Point> gotIt){
         StringBuilder builder = new StringBuilder()
-                .append("Time DiffusionValue")
+                .append("t x y")
                 .append("\r\n");
-        for(Integer d : diffusionMap.keySet()){
+        for(Integer d : gotIt.keySet()){
             builder.append(d)
                     .append(" ")
-                    .append(diffusionMap.get(d))
+                    .append(gotIt.get(d).getX())
+                    .append(" ")
+                    .append(gotIt.get(d).getY())
                     .append("\r\n");
         }
         return builder.toString();
     }
+
 
     public static void writeToMovementFile(String data, String path){
         try {
@@ -396,9 +380,9 @@ public class Engine{
         }
     }
 
-    public static void writeToDiffusionFile(String data, String path){
+    public static void writeToXYMovementFile(String data, String path){
         try {
-            Files.write(Paths.get(path  + "/diffusion" + ".txt"), data.getBytes());
+            Files.write(Paths.get(path  + "/bigXYMovement_MSD" + ".txt"), data.getBytes());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -424,5 +408,34 @@ public class Engine{
         }
         return builder.toString();
     }
+
+    public static void MSDCalculator (int tau, Map<Integer, Point> gotIt){
+
+        double MSDx = 0;
+        double MSDy = 0;
+
+        int count = 0;
+
+        for(Integer seconds : gotIt.keySet()){
+            if(seconds + tau <= 290){
+                MSDx += Math.pow(gotIt.get(seconds+tau).getX() - gotIt.get(seconds).getX(),2);
+                MSDy += Math.pow(gotIt.get(seconds+tau).getY() - gotIt.get(seconds).getY(),2);
+                count++;
+            }
+        }
+        MSDx /= count;
+        MSDy /= count;
+
+        double MSDz;
+        MSDz = Math.sqrt(Math.pow(MSDx,2) + Math.pow(MSDy,2));
+
+//        System.out.println("MSDx: " + MSDx);
+//        System.out.println("MSDy: " + MSDy);
+//        System.out.println("for Tau: " + tau + " MSDz:" + MSDz + " counted: " + count);
+          System.out.println(MSDz);
+
+    }
+
+
 
 }

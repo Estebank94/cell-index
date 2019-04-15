@@ -11,7 +11,7 @@ public class Main {
     /* ekramer: /Users/estebankramer1/Desktop/results */
 
     public static void main( String[] args ){
-        Engine engine = new Engine(100, 100);
+        Engine engine = new Engine(200, 300);
 //        Engine engine = new Engine(100, 100, 10000);
         engine.start("/Users/martinascomazzon/Documents/2019/ITBA/Simulacion de Sistemas/Resultados");
     }
