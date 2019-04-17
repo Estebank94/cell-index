@@ -31,17 +31,14 @@ public class Simulation {
 
     private static double deltaT;
 
-    int i;
-
     /* Used for prediction and correction */
     private static final int[] factorials = {1, 1, 2, 6, 24, 120};
 
-    public Simulation(double deltaT, int i) {
+    public Simulation(double deltaT) {
 
         this.deltaT = deltaT;
         this.particle = new Particle(0, initialPosition, 0, initialVelocity,
                 0, mass, 0);
-        this.i = i;
     }
 
     /* Algorithm Gear Predictor-Corrector */
@@ -51,11 +48,11 @@ public class Simulation {
         while(time < tf){
             gearPredictor();
             time += deltaT;
-            System.out.println("Time: " + time + " Position: " + particle.getX());
         }
+        System.out.println("Time: " + time + " Position: " + particle.getX());
     }
 
-    public void gearPredictor(){
+    private void gearPredictor(){
 
         List<Double> derivatives = derivativeGearPredictor();
 
@@ -75,7 +72,6 @@ public class Simulation {
     private double getForce(double position, double velocity){
         return ((-k * position) - (gamma * velocity))/mass;
     }
-
 
     private List<Double> derivativeGearPredictor(){
 
@@ -131,7 +127,70 @@ public class Simulation {
     }
 
 
+    /* Algorithm Beeman */
+    public void startBeeman(){
+        double time = 0;
 
+        while(time < tf){
+            beeman();
+            time += deltaT;
+        }
+        System.out.println("Time: " + time + " Position: " + particle.getX());
+
+    }
+
+    private void beeman(){
+        double r = particle.getX();     /* distance(t) */
+        double v = particle.getVx();    /* velocity(t) */
+        double a = getForce(r, v);      /* acceleration (t) */
+
+        /* acceleration (t - deltaT) */
+        double previousAcceleration = getPreviousAccelerationWithEuler(r, v); /* acceleration (t - deltaT) */
+
+        double newPosition = newPositionBeeman(r, v, previousAcceleration, a);
+
+        double predictedVelocity = predictVelocityBeeman(v, a, previousAcceleration);
+
+        double newAcceleration = getForce(newPosition, predictedVelocity);
+
+        double newVelocity = newVelocityBeeman (predictedVelocity, previousAcceleration, newAcceleration, a);
+
+        particle.setX(newPosition);
+        particle.setVx(newVelocity);
+
+    }
+
+    private double getPreviousAccelerationWithEuler (double position, double velocity){
+
+        double previousForce = getForce(position, velocity);
+
+        double newPosition = position + velocity*(-deltaT) + ((Math.pow(deltaT, 2) /(2*mass)) * previousForce);
+        double newVelocity = velocity + ((-deltaT/mass)*previousForce);
+
+        return getForce(newPosition, newVelocity);
+    }
+
+    private double newPositionBeeman(double position, double velocity, double previousAcceleration,
+                                     double acceleration){
+
+        return position + velocity*deltaT + ((2/3)*acceleration*Math.pow(deltaT,2))
+                - ((1/6)*previousAcceleration*Math.pow(deltaT,2));
+
+    }
+
+    private double newVelocityBeeman (double velocity, double previousAcceleration,
+                                      double newAcceleration, double currenAcceleration){
+
+        return velocity + ((1/3)*newAcceleration*deltaT) + ((5/6)*currenAcceleration*deltaT)
+                - ((1/6)*previousAcceleration*deltaT);
+    }
+
+    /* slide 19 from class */
+    private double predictVelocityBeeman (double velocity, double acceleration,
+                                          double previousAcceleration){
+
+        return velocity + (3/2*acceleration*deltaT) - ((1/2)*previousAcceleration*deltaT);
+    }
 
 
 }
