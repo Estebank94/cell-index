@@ -15,6 +15,9 @@ public class Main {
             */
             Simulation simulation2 = new Simulation(deltaT);
             simulation2.startBeeman();
+
+            Simulation simulation3 = new Simulation(deltaT);
+            simulation3.startVerlet();
         }
 //    }
 }

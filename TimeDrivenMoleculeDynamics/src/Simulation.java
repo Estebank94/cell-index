@@ -58,7 +58,7 @@ public class Simulation {
 
         List<Double> predictions = predictGearPrediction(derivatives);
 
-        double newAcceleration = getForce(predictions.get(0), predictions.get(1));
+        double newAcceleration = getForce(predictions.get(0), predictions.get(1))/mass;
 
         double deltaA = evaluateGearPrediction(newAcceleration, predictions.get(2));
 
@@ -70,7 +70,7 @@ public class Simulation {
     }
 
     private double getForce(double position, double velocity){
-        return ((-k * position) - (gamma * velocity))/mass;
+        return (-k * position) - (gamma * velocity);
     }
 
     private List<Double> derivativeGearPredictor(){
@@ -85,7 +85,7 @@ public class Simulation {
                                             /* get(2) - acceleration */
 
         for(int i = 2; i<=5; i++){
-            double ri = getForce(derivatives.get(i-2), derivatives.get(i-1));
+            double ri = getForce(derivatives.get(i-2), derivatives.get(i-1))/mass;
             derivatives.add(ri);
         }
 
@@ -140,9 +140,9 @@ public class Simulation {
     }
 
     private void beeman(){
-        double r = particle.getX();     /* distance(t) */
-        double v = particle.getVx();    /* velocity(t) */
-        double a = getForce(r, v);      /* acceleration (t) */
+        double r = particle.getX();          /* distance(t) */
+        double v = particle.getVx();         /* velocity(t) */
+        double a = getForce(r, v)/mass;      /* acceleration (t) */
 
         /* acceleration (t - deltaT) */
         double previousAcceleration = getPreviousAccelerationWithEuler(r, v); /* acceleration (t - deltaT) */
@@ -151,7 +151,7 @@ public class Simulation {
 
         double predictedVelocity = predictVelocityBeeman(v, a, previousAcceleration);
 
-        double newAcceleration = getForce(newPosition, predictedVelocity);
+        double newAcceleration = getForce(newPosition, predictedVelocity)/mass;
 
         double newVelocity = newVelocityBeeman (predictedVelocity, previousAcceleration, newAcceleration, a);
 
@@ -190,6 +190,44 @@ public class Simulation {
                                           double previousAcceleration){
 
         return velocity + (3/2*acceleration*deltaT) - ((1/2)*previousAcceleration*deltaT);
+    }
+
+    /* Algorithm Verlet (1) - Slide 12 & Slide 14 - */
+    public void startVerlet(){
+        double time = 0;
+
+
+        while(time < tf){
+            verlet();
+            time += deltaT;
+        }
+        System.out.println("Time: " + time + " Position: " + particle.getX());
+    }
+
+    private void verlet(){
+        double r = particle.getX();
+        double v = particle.getVx();
+        double force = getForce(r,v);
+        double a = force/mass;
+
+        /* todo: euler lo deberia de hacer nada mas la primera vez */
+        double previousPosition = getPreviousPositionWithEuler(r, v, force);
+
+        double newPosition = (2*r) - previousPosition + ((Math.pow(deltaT,2)*force)/mass);
+
+        double newVelocity = (newPosition - previousPosition)/(2*deltaT);
+
+        particle.setX(newPosition);
+        particle.setVx(newVelocity);
+    }
+
+    private double getPreviousPositionWithEuler(double position, double velocity,
+                                                    double force){
+
+        double pos = position - deltaT * velocity;
+        pos -= Math.pow(deltaT, 2) * force / (2 * mass);
+        return pos;
+
     }
 
 
