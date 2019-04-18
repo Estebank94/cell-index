@@ -1,5 +1,11 @@
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class Simulation {
 
@@ -14,6 +20,7 @@ public class Simulation {
         * r (t=0) = 1 m;
         * v (t=0) = - A 𝛾/(2m) m/s;
      */
+    private BufferedWriter bw;
 
     private Particle particle;
 
@@ -42,14 +49,17 @@ public class Simulation {
     }
 
     /* Algorithm Gear Predictor-Corrector */
-    public void startGearPredictor(){
+    public void startGearPredictor(String path){
         double time = 0;
+        initalizeBW(path,"GearPredictor");
 
         while(time <= tf){
             gearPredictor();
+            appendToFile(bw,generateFileString(particle));
             time += deltaT;
         }
-        System.out.println("Time: " + (time-deltaT) + " Position: " + particle.getX());
+        closeBW();
+//        System.out.println("Time: " + (time-deltaT) + " Position: " + particle.getX());
     }
 
     private void gearPredictor(){
@@ -128,16 +138,18 @@ public class Simulation {
 
 
     /* Algorithm Beeman */
-    public void startBeeman(){
+    public void startBeeman(String path){
         double time = 0;
+        initalizeBW(path,"Beeman");
         double previousAcceleration = firstBeeman();
 
         while(time <= tf){
             previousAcceleration = beeman(previousAcceleration);
+            appendToFile(bw,generateFileString(particle));
             time += deltaT;
         }
-        System.out.println("Time: " + (time-deltaT) + " Position: " + particle.getX());
-
+        closeBW();
+//        System.out.println("Time: " + (time-deltaT) + " Position: " + particle.getX());
     }
 
     private double beeman(double previousAcceleration){
@@ -204,17 +216,20 @@ public class Simulation {
     }
 
     /* Algorithm Verlet (1) - Slide 12 & Slide 14 - */
-    public void startVerlet(){
+    public void startVerlet(String path){
         double time = 0;
+        initalizeBW(path,"Verlet");
         double previousPosition = firstVerlet();
 
 
         while(time <= tf){
             previousPosition = verlet(previousPosition);
+            appendToFile(bw,generateFileString(particle));
             time += deltaT;
 
         }
-        System.out.println("Time: " + (time-deltaT) + " Position: " + particle.getX());
+        closeBW();
+//        System.out.println("Time: " + (time-deltaT) + " Position: " + particle.getX());
     }
 
     private double firstVerlet(){
@@ -250,22 +265,67 @@ public class Simulation {
 
     }
 
-    public void startAnaliticSolution(){
+    public void startAnaliticSolution(String path){
         double time = 0;
         double value = 0;
+        initalizeBW(path,"Analitic");
 
 
         while(time <= tf){
             value = getParticleRealPosition(time);
+            appendToFile(bw,generateFileString(particle));
             time += deltaT;
             particle.setX(value);
         }
-        System.out.println("Time: " + (time-deltaT) + " Position: " + value);
-
+        closeBW();
+//        System.out.println("Time: " + (time-deltaT) + " Position: " + value);
     }
 
     private double getParticleRealPosition(double time) {
         return A * Math.exp(-(gamma / (2*mass)) * time) * Math.cos( Math.sqrt((k / mass) - (gamma*gamma / (4 * mass * mass) )) * time);
+    }
+
+    /* File */
+    private void closeBW() {
+        if (bw != null) try {
+            bw.flush();
+            bw.close();
+        } catch (IOException ioe2) {
+            // just ignore it
+        }
+    }
+
+    private boolean initalizeBW(String outPath,String algType) {
+        try {
+
+            bw = new BufferedWriter(new FileWriter(outPath+algType+"-dt:"+ deltaT +"-tf:"+ tf + ".txt", true));
+        } catch (IOException e){
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    private String generateFileString(Particle particle){
+
+        DecimalFormat df = new DecimalFormat("#");
+        df.setMaximumFractionDigits(12);
+        df.setMinimumIntegerDigits(1);
+        df.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
+        StringBuilder builder = new StringBuilder()
+                .append(df.format(particle.getX()))
+                .append("\n");
+        return builder.toString();
+    }
+
+
+
+    public static void appendToFile (BufferedWriter bw , String data) {
+        try {
+            bw.write(data);
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
     }
 
 
