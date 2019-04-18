@@ -45,11 +45,11 @@ public class Simulation {
     public void startGearPredictor(){
         double time = 0;
 
-        while(time < tf){
+        while(time <= tf){
             gearPredictor();
             time += deltaT;
         }
-        System.out.println("Time: " + time + " Position: " + particle.getX());
+        System.out.println("Time: " + (time-deltaT) + " Position: " + particle.getX());
     }
 
     private void gearPredictor(){
@@ -132,11 +132,11 @@ public class Simulation {
         double time = 0;
         double previousAcceleration = firstBeeman();
 
-        while(time < tf){
+        while(time <= tf){
             previousAcceleration = beeman(previousAcceleration);
             time += deltaT;
         }
-        System.out.println("Time: " + time + " Position: " + particle.getX());
+        System.out.println("Time: " + (time-deltaT) + " Position: " + particle.getX());
 
     }
 
@@ -209,11 +209,12 @@ public class Simulation {
         double previousPosition = firstVerlet();
 
 
-        while(time < tf){
+        while(time <= tf){
             previousPosition = verlet(previousPosition);
             time += deltaT;
+
         }
-        System.out.println("Time: " + time + " Position: " + particle.getX());
+        System.out.println("Time: " + (time-deltaT) + " Position: " + particle.getX());
     }
 
     private double firstVerlet(){
@@ -249,17 +250,25 @@ public class Simulation {
 
     }
 
-    private double getParticleRealPosition() {
-        double A = 1;
+    public void startAnaliticSolution(){
+        double time = 0;
+        double value = 0;
 
-        return A * Math.exp(-(gamma / (2*mass)) * tf) * Math.cos( Math.sqrt((k / mass) - (gamma*gamma / (4 * mass * mass) )) * tf);
+
+        while(time <= tf){
+            value = getParticleRealPosition(time);
+            time += deltaT;
+            particle.setX(value);
+        }
+        System.out.println("Time: " + (time-deltaT) + " Position: " + value);
+
     }
 
-    public void analiticSolution(){
-        double value = getParticleRealPosition();
-
-        System.out.println("Time: " + tf + " Position: " + value);
+    private double getParticleRealPosition(double time) {
+        return A * Math.exp(-(gamma / (2*mass)) * time) * Math.cos( Math.sqrt((k / mass) - (gamma*gamma / (4 * mass * mass) )) * time);
     }
+
+
 
 
 
