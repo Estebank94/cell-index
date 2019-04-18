@@ -18,6 +18,9 @@ public class Main {
 
             Simulation simulation3 = new Simulation(deltaT);
             simulation3.startVerlet();
+
+            Simulation simulation4 = new Simulation(deltaT);
+            simulation4.analiticSolution();
         }
 //    }
 }

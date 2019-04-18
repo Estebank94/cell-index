@@ -130,22 +130,21 @@ public class Simulation {
     /* Algorithm Beeman */
     public void startBeeman(){
         double time = 0;
+        double previousAcceleration = firstBeeman();
 
         while(time < tf){
-            beeman();
+            previousAcceleration = beeman(previousAcceleration);
             time += deltaT;
         }
         System.out.println("Time: " + time + " Position: " + particle.getX());
 
     }
 
-    private void beeman(){
+    private double beeman(double previousAcceleration){
         double r = particle.getX();          /* distance(t) */
         double v = particle.getVx();         /* velocity(t) */
         double a = getForce(r, v)/mass;      /* acceleration (t) */
 
-        /* acceleration (t - deltaT) */
-        double previousAcceleration = getPreviousAccelerationWithEuler(r, v); /* acceleration (t - deltaT) */
 
         double newPosition = newPositionBeeman(r, v, previousAcceleration, a);
 
@@ -157,7 +156,19 @@ public class Simulation {
 
         particle.setX(newPosition);
         particle.setVx(newVelocity);
+        return a;
 
+    }
+
+    private double firstBeeman(){
+        double r = particle.getX();          /* distance(t) */
+        double v = particle.getVx();         /* velocity(t) */
+        double a = getForce(r, v)/mass;      /* acceleration (t) */
+
+        /* acceleration (t - deltaT) */
+        double previousAcceleration = getPreviousAccelerationWithEuler(r, v); /* acceleration (t - deltaT) */
+
+        return previousAcceleration;
     }
 
     private double getPreviousAccelerationWithEuler (double position, double velocity){
@@ -195,23 +206,30 @@ public class Simulation {
     /* Algorithm Verlet (1) - Slide 12 & Slide 14 - */
     public void startVerlet(){
         double time = 0;
+        double previousPosition = firstVerlet();
 
 
         while(time < tf){
-            verlet();
+            previousPosition = verlet(previousPosition);
             time += deltaT;
         }
         System.out.println("Time: " + time + " Position: " + particle.getX());
     }
 
-    private void verlet(){
+    private double firstVerlet(){
         double r = particle.getX();
         double v = particle.getVx();
         double force = getForce(r,v);
-        double a = force/mass;
-
-        /* todo: euler lo deberia de hacer nada mas la primera vez */
         double previousPosition = getPreviousPositionWithEuler(r, v, force);
+
+        return previousPosition;
+
+    }
+
+    private double verlet(double previousPosition){
+        double r = particle.getX();
+        double v = particle.getVx();
+        double force = getForce(r,v);
 
         double newPosition = (2*r) - previousPosition + ((Math.pow(deltaT,2)*force)/mass);
 
@@ -219,6 +237,7 @@ public class Simulation {
 
         particle.setX(newPosition);
         particle.setVx(newVelocity);
+        return r;
     }
 
     private double getPreviousPositionWithEuler(double position, double velocity,
@@ -229,6 +248,20 @@ public class Simulation {
         return pos;
 
     }
+
+    private double getParticleRealPosition() {
+        double A = 1;
+
+        return A * Math.exp(-(gamma / (2*mass)) * tf) * Math.cos( Math.sqrt((k / mass) - (gamma*gamma / (4 * mass * mass) )) * tf);
+    }
+
+    public void analiticSolution(){
+        double value = getParticleRealPosition();
+
+        System.out.println("Time: " + tf + " Position: " + value);
+    }
+
+
 
 
 }
