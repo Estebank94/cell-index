@@ -126,7 +126,7 @@ public class Simulation {
     private List<Double> correctGearPrediction (double deltaA, List<Double> predictions){
 
         List<Double> correct = new ArrayList<>();
-        double[] alphaOrder5 = {3.0/20, 251.0/360, 1.0, 11.0/18, 1.0/6, 1.0/60};
+        double[] alphaOrder5 = {3.0/16, 251.0/360, 1.0, 11.0/18, 1.0/6, 1.0/60};
 
         for(int i = 0; i<predictions.size(); i++){
             double ri = predictions.get(i) + (deltaA*alphaOrder5[i]*factorials[i])/(Math.pow(deltaT,i));
