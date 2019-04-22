@@ -187,7 +187,6 @@ public class Simulation {
     private double firstBeeman(){
         double r = particle.getX();          /* distance(t) */
         double v = particle.getVx();         /* velocity(t) */
-        double a = getForce(r, v)/mass;      /* acceleration (t) */
 
         /* acceleration (t - deltaT) */
         double previousAcceleration = getPreviousAccelerationWithEuler(r, v); /* acceleration (t - deltaT) */
