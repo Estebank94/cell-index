@@ -41,25 +41,33 @@ public class Simulation {
     /* Used for prediction and correction */
     private static final int[] factorials = {1, 1, 2, 6, 24, 120};
 
-    public Simulation(double deltaT) {
+    /* Step */
+    private int step;
+
+    public Simulation(double deltaT, int step) {
 
         this.deltaT = deltaT;
         this.particle = new Particle(0, initialPosition, 0, initialVelocity,
                 0, mass, 0);
+        this.step = step;
     }
 
     /* Algorithm Gear Predictor-Corrector */
     public void startGearPredictor(String path){
         double time = 0;
         initalizeBW(path,"GearPredictor");
+        int iteration = 0;
 
         while(time <= tf){
             gearPredictor();
-            appendToFile(bw,generateFileString(particle));
+            if(iteration % step == 0 || iteration == 0){
+                appendToFile(bw,generateFileString(particle));
+            }
             time += deltaT;
+            iteration ++;
         }
         closeBW();
-//        System.out.println("Time: " + (time-deltaT) + " Position: " + particle.getX());
+        System.out.println("Time: " + (time-deltaT) + " Position: " + particle.getX());
     }
 
     private void gearPredictor(){
@@ -142,14 +150,18 @@ public class Simulation {
         double time = 0;
         initalizeBW(path,"Beeman");
         double previousAcceleration = firstBeeman();
+        int iteration = 0;
 
         while(time <= tf){
             previousAcceleration = beeman(previousAcceleration);
-            appendToFile(bw,generateFileString(particle));
+            if(iteration % step == 0 || iteration == 0){
+                appendToFile(bw,generateFileString(particle));
+            }
+            iteration ++;
             time += deltaT;
         }
         closeBW();
-//        System.out.println("Time: " + (time-deltaT) + " Position: " + particle.getX());
+        System.out.println("Time: " + (time-deltaT) + " Position: " + particle.getX());
     }
 
     private double beeman(double previousAcceleration){
@@ -220,16 +232,20 @@ public class Simulation {
         double time = 0;
         initalizeBW(path,"Verlet");
         double previousPosition = firstVerlet();
+        int iteration = 0;
 
 
         while(time <= tf){
             previousPosition = verlet(previousPosition);
-            appendToFile(bw,generateFileString(particle));
+            if( iteration % step == 0 || iteration == 0 ){
+                appendToFile(bw,generateFileString(particle));
+            }
+            iteration ++;
             time += deltaT;
 
         }
         closeBW();
-//        System.out.println("Time: " + (time-deltaT) + " Position: " + particle.getX());
+        System.out.println("Time: " + (time-deltaT) + " Position: " + particle.getX());
     }
 
     private double firstVerlet(){
@@ -269,16 +285,20 @@ public class Simulation {
         double time = 0;
         double value = 0;
         initalizeBW(path,"Analitic");
+        int iteration = 0;
 
 
         while(time <= tf){
             value = getParticleRealPosition(time);
-            appendToFile(bw,generateFileString(particle));
+            if(iteration % step == 0 || iteration == 0){
+                appendToFile(bw,generateFileString(particle));
+            }
+            iteration ++;
             time += deltaT;
             particle.setX(value);
         }
         closeBW();
-//        System.out.println("Time: " + (time-deltaT) + " Position: " + value);
+        System.out.println("Time: " + (time-deltaT) + " Position: " + value);
     }
 
     private double getParticleRealPosition(double time) {
