@@ -29,18 +29,18 @@ public class Engine{
     private static int forceCutDistance = 5;
     private static double dt = 1;
     private static double deltaT = Math.pow(10, -5);
-    private static double tf = 5;
+    private static double k = Math.pow(10,4); /* measured in N/m [Elastic constant]*/
+    private static double gamma = 100; /* measured in kg/s [Coefficient]*/
+    private static double tf = 1;
 
     private List<Particle> particles;
-    private List<Point> previousPositions;
 
     public Engine(double numberOfParticles, double time) {
         this.numberOfParticles = numberOfParticles;
         this.time = time;
         particles = new ArrayList<>();
-        previousPositions = new ArrayList<>();
         addParticles();
-        addPreviousPositions();
+//        addPreviousPositionsWithEuler();
     }
 
 //    |
@@ -141,7 +141,7 @@ public class Engine{
             double vx = velocity * Math.cos(angle);
             double vy = velocity * Math.sin(angle);
 
-            particles.add(new Particle(i, x, y, vx, vy, mass, radius));
+            particles.add(new Particle(i, x, y, 0,0, vx, vy, mass, radius));
         }
 
         return particles;
@@ -165,7 +165,8 @@ public class Engine{
         int count = 0;
 
         while (t < time) {
-            System.out.println(t);
+            /* me fijo particula por particula  que particulas estan en mi radio de accion para calcular
+            * la fuerza entre mi particula y las otras particulas en el radio*/
             for(Particle p1 : particles) {
                 for(Particle p2 : particles) {
                     if(!p1.equals(p2)){
@@ -176,6 +177,7 @@ public class Engine{
                     }
                 }
 
+                /* trato a la pared como una particula */
                 distanceToHorizontalWall = distanceToHorizontalWall(p1);
                 if(distanceToHorizontalWall.getDistance() != Double.POSITIVE_INFINITY){
                     setParticleForce(p1, distanceToHorizontalWall.getDistance(), distanceToHorizontalWall.getPoint().getX(), distanceToHorizontalWall.getPoint().getY());
@@ -191,14 +193,17 @@ public class Engine{
                     setParticleForce(p1, distanceToMiddleWall.getDistance(), distanceToMiddleWall.getPoint().getX(), distanceToMiddleWall.getPoint().getY());
                 }
 
-                for(Point prevPos : previousPositions){
-                    startVerlet(p1, prevPos);
+                /* si todavia no tengo la posicion anterior es que no use euler */
+                if(p1.getPrevX() == 0){
+                    setPreviousPositionWithEuler(p1);
+                } else {
+                    startVerlet(p1);
                 }
             }
 
             t += dt;
             String toWrite = generateFileString(particles);
-//            System.out.println(toWrite);
+            System.out.println(toWrite);
             Engine.writeToFile(toWrite,count++, path);
         }
     }
@@ -250,7 +255,6 @@ public class Engine{
         Point e = calculatePolarity(p, x2, y2);
         double fx = force * e.getX();
         double fy = force * e.getY();
-        p.setForce(p.getForce() + force);
         p.setFx(p.getFx() + fx);
         p.setFy(p.getFy() + fy);
     }
@@ -274,52 +278,60 @@ public class Engine{
 
     /* VERLET */
 
-    public void startVerlet(Particle particle, Point previousPosition){
+    public void startVerlet(Particle particle){
         double time = 0;
         int iteration = 0;
 
 
         while(time <= tf){
-            previousPosition = verlet(previousPosition, particle);
+            if(particle.getX() < 0 || particle.getX() == Double.NaN || particle.getX() == Double.POSITIVE_INFINITY) {
+//                System.out.println(iteration);
+            }
+//            System.out.println(particle.getX());
+            verlet(particle);
             iteration ++;
             time += deltaT;
 
         }
-        System.out.println("Time: " + (time-deltaT) + " Position: { x = " + particle.getX() + " y=" + particle.getY() + " }");
+        System.out.println("Iteration: "+ iteration +" Time: " + (time-deltaT) + " Position: { x = " + particle.getX() + " y=" + particle.getY() + " }");
     }
 
-    private Point firstVerlet(Particle particle){
-        return getPreviousPositionWithEuler(particle);
-    }
 
-    private Point verlet(Point previousPosition, Particle particle){
+    private Point verlet(Particle particle){
         double rx = particle.getX();
         double ry = particle.getY();
-        double newX = (2*rx) - previousPosition.getX() + ((Math.pow(deltaT,2)*particle.getFx())/mass);
-        double newY = (2*ry) - previousPosition.getY() + ((Math.pow(deltaT,2)*particle.getFy())/mass);
+        double newX = (2*rx) - particle.getPrevX() + ((Math.pow(deltaT,2)*particle.getFx())/mass);
+        double newY = (2*ry) - particle.getPrevY() + ((Math.pow(deltaT,2)*particle.getFy())/mass);
+        if(rx <= 0 || newX <= 0 || rx == Double.POSITIVE_INFINITY){
+//            System.out.println("Hola");
+        }
+
 //        double newVx = (newX - previousPosition.getX())/(2*deltaT);
 //        double newVy = (newY - previousPosition.getY())/(2*deltaT);
         particle.setX(newX);
         particle.setY(newY);
+        particle.setPrevX(rx);
+        particle.setPrevY(ry);
 //        particle.setVx(newVx);
 //        particle.setVy(newVy);
         return new Point(rx, ry);
     }
 
-    private Point getPreviousPositionWithEuler(Particle p){
+    private void setPreviousPositionWithEuler(Particle p){
 
         double posX = p.getX() - deltaT * p.getVx();
         double posY = p.getY() - deltaT * p.getVy();
         posX -= Math.pow(deltaT, 2) * p.getFx() / (2 * mass);
         posY -= Math.pow(deltaT, 2) * p.getFy() / (2 * mass);
-        return new Point(posX, posY);
+        p.setPrevX(posX);
+        p.setPrevY(posY);
+//        de aca no salen los negativos, chequeado
 
     }
 
-    public void addPreviousPositions() {
-        for (Particle p : particles) {
-            previousPositions.add(firstVerlet(p));
-        }
+//    esto no se cuando usarlo porque la formula de la fuerza LJ no depende de la velocidad
+    private void setPreviousAccelerationWithEuler (Particle p){
+
     }
 
 

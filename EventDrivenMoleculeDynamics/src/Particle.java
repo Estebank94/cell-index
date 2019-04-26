@@ -5,13 +5,16 @@ public class Particle {
     private int id;
     private double x;
     private double y;
+    private double prevX;
+    private double prevY;
     private double vx;
     private double vy;
     private double mass;
     private double radius;
-    private double force;
     private double fx;
     private double fy;
+    private double prevFx;
+    private double prevFy;
     private long updateCount;
 
     public Particle(int id, double x, double y, double vx, double vy, double mass, double radius) {
@@ -25,18 +28,21 @@ public class Particle {
         this.updateCount = 0;
     }
 
-    public Particle(int id, double x, double y, double vx, double vy, double mass, double radius, double force, double fx, double fy) {
+    public Particle(int id, double x, double y, double prevX, double prevY, double vx, double vy, double mass, double radius) {
         this.id = id;
         this.x = x;
         this.y = y;
+        this.prevX = prevX;
+        this.prevY = prevY;
         this.vx = vx;
         this.vy = vy;
         this.mass = mass;
         this.radius = radius;
         this.updateCount = 0;
-        this.force = force;
-        this.fx = fx;
-        this.fy = fy;
+        this.fx = 0;
+        this.fy = 0;
+        this.prevFx = 0;
+        this.prevFy = 0;
     }
 
     public int getId() {
@@ -75,12 +81,24 @@ public class Particle {
         return fy;
     }
 
+    public double getPrevX() {
+        return prevX;
+    }
+
+    public double getPrevY() {
+        return prevY;
+    }
+
     public long getUpdateCount() {
         return updateCount;
     }
 
-    public double getForce() {
-        return force;
+    public double getPrevFx() {
+        return prevFx;
+    }
+
+    public double getPrevFy() {
+        return prevFy;
     }
 
     public void setX(double x) {
@@ -111,8 +129,20 @@ public class Particle {
         this.fy = fy;
     }
 
-    public void setForce(double force) {
-        this.force = force;
+    public void setPrevX(double prevX) {
+        this.prevX = prevX;
+    }
+
+    public void setPrevY(double prevY) {
+        this.prevY = prevY;
+    }
+
+    public void setPrevFx(double prevFx) {
+        this.prevFx = prevFx;
+    }
+
+    public void setPrevFy(double prevFy) {
+        this.prevFy = prevFy;
     }
 
     public void increaseUpdateCount(){
