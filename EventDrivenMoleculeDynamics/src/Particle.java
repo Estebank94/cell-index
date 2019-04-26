@@ -9,6 +9,10 @@ public class Particle {
     private double vy;
     private double mass;
     private double radius;
+    private double force;
+    private double fx;
+    private double fy;
+    private long updateCount;
 
     public Particle(int id, double x, double y, double vx, double vy, double mass, double radius) {
         this.id = id;
@@ -18,6 +22,21 @@ public class Particle {
         this.vy = vy;
         this.mass = mass;
         this.radius = radius;
+        this.updateCount = 0;
+    }
+
+    public Particle(int id, double x, double y, double vx, double vy, double mass, double radius, double force, double fx, double fy) {
+        this.id = id;
+        this.x = x;
+        this.y = y;
+        this.vx = vx;
+        this.vy = vy;
+        this.mass = mass;
+        this.radius = radius;
+        this.updateCount = 0;
+        this.force = force;
+        this.fx = fx;
+        this.fy = fy;
     }
 
     public int getId() {
@@ -48,6 +67,22 @@ public class Particle {
         return radius;
     }
 
+    public double getFx() {
+        return fx;
+    }
+
+    public double getFy() {
+        return fy;
+    }
+
+    public long getUpdateCount() {
+        return updateCount;
+    }
+
+    public double getForce() {
+        return force;
+    }
+
     public void setX(double x) {
         this.x = x;
     }
@@ -64,6 +99,25 @@ public class Particle {
         this.vy = vy;
     }
 
+    public static double borderDistanceBetweenParticles(Particle p1, Particle p2){
+        return Point.distanceBetween(new Point(p1.getX(), p1.getY()), new Point(p2.getX(), p2.getY())) - p1.getRadius() - p2.getRadius();
+    }
+
+    public void setFx(double fx) {
+        this.fx = fx;
+    }
+
+    public void setFy(double fy) {
+        this.fy = fy;
+    }
+
+    public void setForce(double force) {
+        this.force = force;
+    }
+
+    public void increaseUpdateCount(){
+        updateCount++;
+    }
 
     @Override
     public String toString() {

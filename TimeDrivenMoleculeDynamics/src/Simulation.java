@@ -346,10 +346,4 @@ public class Simulation {
             ioe.printStackTrace();
         }
     }
-
-
-
-
-
-
 }
