@@ -28,6 +28,12 @@ public class Particle {
         this.updateCount = 0;
     }
 
+    public Particle(double x, double y, double radius) {
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+    }
+
     public Particle(int id, double x, double y, double prevX, double prevY, double vx, double vy, double mass, double radius) {
         this.id = id;
         this.x = x;

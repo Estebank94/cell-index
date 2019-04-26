@@ -33,7 +33,7 @@ public class Main {
 //    }
 
     public static void main( String[] args ){
-        Engine engine = new Engine(100, 300);
+        Engine engine = new Engine(1000, 100);
         engine.start("/Users/estebankramer1/Desktop/results");
     }
 }

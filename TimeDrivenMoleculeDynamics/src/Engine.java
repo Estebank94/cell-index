@@ -43,81 +43,6 @@ public class Engine{
 //        addPreviousPositionsWithEuler();
     }
 
-//    |
-//    |      .
-//    |
-//
-//    VERTICAL WALL
-
-    private static PointAndDistance distanceToVerticalWall(Particle p) {
-        double xPosition = p.getX() + p.getRadius();
-        if(xPosition <= forceCutDistance){
-            /* pared vertical izquierda */
-            return new PointAndDistance(new Point(0,p.getY()), xPosition);
-        } else if(boxWidth - xPosition <= forceCutDistance){
-            /* pared vertical derecha */
-            return new PointAndDistance(new Point(boxWidth,p.getY()), boxWidth - xPosition);
-        }
-        /* no estoy a la distancia adecuada */
-        return new PointAndDistance(new Point(0,0), Double.POSITIVE_INFINITY);
-    }
-
-//    _________
-//        .
-//
-//    HORIZONTAL WALL
-
-    private static PointAndDistance distanceToHorizontalWall(Particle p) {
-        double yPosition = p.getY() + p.getRadius();
-        if ( yPosition <= forceCutDistance ) {
-            /* pared horizontal de abajo */
-            return new PointAndDistance(new Point(p.getX(),0), yPosition);
-        } else if ( boxHeight - yPosition <= forceCutDistance) {
-            /* pared horizontal de arriba */
-            return new PointAndDistance(new Point(p.getX(),boxHeight), boxHeight - yPosition);
-        }
-        /* no estoy a la distancia adecuada */
-        return new PointAndDistance(new Point(0,0), Double.POSITIVE_INFINITY);
-    }
-
-
-//         |
-//         |
-//         |
-//     .
-//         |
-//         |
-//         |
-//
-//    MIDDLE WALL
-    private static PointAndDistance distanceToMiddleWall(Particle p) {
-        double xPosition = p.getX() + p.getRadius();
-        double yPosition = p.getY() + p.getRadius();
-
-        double xDistanceToMiddleWall = Math.abs(boxWidth/2 - xPosition);
-        double distance = Double.POSITIVE_INFINITY;
-        double aux1, aux2;
-
-        /* si en y estoy a la altura del aujero */
-        if(yPosition >= boxHeight/2 - openingSize /2 || yPosition <= (boxHeight - boxHeight/2 + openingSize/2)){
-
-            double yDistanceToBottomWall = Math.abs(yPosition - boxHeight/2 - openingSize /2);
-            aux1 = Math.sqrt(yDistanceToBottomWall * yDistanceToBottomWall + xDistanceToMiddleWall * xDistanceToMiddleWall);
-            if(aux1 <= forceCutDistance) {
-                distance = aux1;
-            }
-
-            double yDistanceToTopWall = Math.abs((boxHeight - boxHeight/2 + openingSize/2) - yPosition);
-            aux2 = Math.sqrt(yDistanceToTopWall * yDistanceToTopWall + xDistanceToMiddleWall * xDistanceToMiddleWall);
-            if(aux2 <= forceCutDistance && aux2 < distance) {
-                distance = aux2;
-            }
-        } else if(xDistanceToMiddleWall <= forceCutDistance) { /* si estoy en x estoy en el rango y en y no estoy en el aujero*/
-            distance = xDistanceToMiddleWall;
-        }
-        return new PointAndDistance(new Point(p.getX(), p.getY()), distance);
-    }
-
 
     public List<Particle> addParticles() {
 
@@ -143,6 +68,7 @@ public class Engine{
 
             particles.add(new Particle(i, x, y, 0,0, vx, vy, mass, radius));
         }
+
 
         return particles;
     }
@@ -172,26 +98,83 @@ public class Engine{
                     if(!p1.equals(p2)){
                         particleDistance = Particle.borderDistanceBetweenParticles(p1,p2);
                         if(particleDistance <= forceCutDistance) {
+//                            System.out.println("Particula");
                             setParticleForce(p1, particleDistance, p2.getX(), p2.getY());
                         }
                     }
                 }
 
+
+                //    |
+                //    |      .
+                //    |
+                //
+                //    VERTICAL WALL
                 /* trato a la pared como una particula */
-                distanceToHorizontalWall = distanceToHorizontalWall(p1);
-                if(distanceToHorizontalWall.getDistance() != Double.POSITIVE_INFINITY){
-                    setParticleForce(p1, distanceToHorizontalWall.getDistance(), distanceToHorizontalWall.getPoint().getX(), distanceToHorizontalWall.getPoint().getY());
+                Particle leftWall = new Particle(0, p1.getY(), radius);
+                particleDistance = Particle.borderDistanceBetweenParticles(p1,leftWall);
+                if(particleDistance <= forceCutDistance){
+//                    System.out.println("Pared horizontal izquierda");
+                    setParticleForce(p1, particleDistance, leftWall.getX(),leftWall.getY());
+
                 }
 
-                distanceToVerticalWall = distanceToVerticalWall(p1);
-                if(distanceToVerticalWall.getDistance() != Double.POSITIVE_INFINITY){
-                    setParticleForce(p1, distanceToVerticalWall.getDistance(), distanceToVerticalWall.getPoint().getX(), distanceToVerticalWall.getPoint().getY());
+                Particle rightWall = new Particle(boxWidth, p1.getY(), radius);
+                particleDistance = Particle.borderDistanceBetweenParticles(p1,rightWall);
+                if(particleDistance <= forceCutDistance){
+//                    System.out.println("Pared horizontal derecha");
+                    setParticleForce(p1, particleDistance, rightWall.getX(),rightWall.getY());
+
                 }
 
-                distanceToMiddleWall = distanceToMiddleWall(p1);
-                if(distanceToMiddleWall.getDistance() != Double.POSITIVE_INFINITY){
-                    setParticleForce(p1, distanceToMiddleWall.getDistance(), distanceToMiddleWall.getPoint().getX(), distanceToMiddleWall.getPoint().getY());
+                //    _________
+                //        .
+                //
+                //    HORIZONTAL WALL
+
+                Particle bottomWall = new Particle(p1.getX(), 0, radius);
+                particleDistance = Particle.borderDistanceBetweenParticles(p1,bottomWall);
+                if(particleDistance <= forceCutDistance){
+//                    System.out.println("Pared vertical de abajo");
+                    setParticleForce(p1, particleDistance, bottomWall.getX(),bottomWall.getY());
+
                 }
+
+                Particle topWall = new Particle(p1.getX(), boxHeight, radius);
+                particleDistance = Particle.borderDistanceBetweenParticles(p1,topWall);
+                if(particleDistance <= forceCutDistance){
+//                    System.out.println("Pared vertical de arriba");
+                    setParticleForce(p1, particleDistance, topWall.getX(), topWall.getY());
+                }
+
+
+                //         |
+                //         |
+                //         |
+                //     .
+                //         |
+                //         |
+                //         |
+                //
+                //    MIDDLE WALL
+
+                double y;
+                /* si estoy a la altura del aujero de la pared de la mitad */
+                if(p1.getY() < boxHeight - boxHeight/2 - openingSize/2 && p1.getY() > boxHeight/2 - openingSize/2) {
+                    double dist1 = Math.abs(p1.getY() - boxHeight - boxHeight/2 - openingSize/2);
+                    double dist2 = Math.abs(p1.getY() - boxHeight/2 - openingSize/2);
+                    y = dist1 < dist2 ? dist1 : dist2;
+                } else {
+                    y = p1.getY();
+                }
+                Particle middleWall = new Particle(boxWidth/2, y, radius);
+                particleDistance = Particle.borderDistanceBetweenParticles(p1,middleWall);
+                if(particleDistance <= forceCutDistance){
+                    System.out.println("Pared del medio");
+                    setParticleForce(p1, particleDistance, middleWall.getX(),middleWall.getY());
+
+                }
+
 
                 /* si todavia no tengo la posicion anterior es que no use euler */
                 if(p1.getPrevX() == 0){
@@ -203,7 +186,7 @@ public class Engine{
 
             t += dt;
             String toWrite = generateFileString(particles);
-            System.out.println(toWrite);
+//            System.out.println(toWrite);
             Engine.writeToFile(toWrite,count++, path);
         }
     }
@@ -284,16 +267,12 @@ public class Engine{
 
 
         while(time <= tf){
-            if(particle.getX() < 0 || particle.getX() == Double.NaN || particle.getX() == Double.POSITIVE_INFINITY) {
-//                System.out.println(iteration);
-            }
-//            System.out.println(particle.getX());
             verlet(particle);
             iteration ++;
             time += deltaT;
 
         }
-        System.out.println("Iteration: "+ iteration +" Time: " + (time-deltaT) + " Position: { x = " + particle.getX() + " y=" + particle.getY() + " }");
+//        System.out.println("Iteration: "+ iteration +" Time: " + (time-deltaT) + " Position: { x = " + particle.getX() + " y=" + particle.getY() + " }");
     }
 
 
@@ -302,18 +281,10 @@ public class Engine{
         double ry = particle.getY();
         double newX = (2*rx) - particle.getPrevX() + ((Math.pow(deltaT,2)*particle.getFx())/mass);
         double newY = (2*ry) - particle.getPrevY() + ((Math.pow(deltaT,2)*particle.getFy())/mass);
-        if(rx <= 0 || newX <= 0 || rx == Double.POSITIVE_INFINITY){
-//            System.out.println("Hola");
-        }
-
-//        double newVx = (newX - previousPosition.getX())/(2*deltaT);
-//        double newVy = (newY - previousPosition.getY())/(2*deltaT);
         particle.setX(newX);
         particle.setY(newY);
         particle.setPrevX(rx);
         particle.setPrevY(ry);
-//        particle.setVx(newVx);
-//        particle.setVy(newVy);
         return new Point(rx, ry);
     }
 
