@@ -124,8 +124,12 @@ public class Particle {
     }
 
     public static double borderDistanceBetweenParticles(Particle p1, Particle p2){
-        return Point.distanceBetween(new Point(p1.getX(), p1.getY()), new Point(p2.getX(), p2.getY())) - p1.getRadius() - p2.getRadius();
+        return Point.distanceBetween(new Point(p1.getX(), p1.getY()), new Point(p2.getX(), p2.getY()));
     }
+
+//    public static double borderDistanceBetweenParticles(Particle p1, Particle p2){
+//        return Point.distanceBetween(new Point(p1.getX(), p1.getY()), new Point(p2.getX(), p2.getY())) - p1.getRadius() - p2.getRadius();
+//    }
 
     public void setFx(double fx) {
         this.fx = fx;

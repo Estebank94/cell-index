@@ -24,13 +24,10 @@ public class Engine{
     private double U = 0; /* Potential energy */
 
     /* Constants */
-    private static int epsilon = 2; /* Units Joules */
-    private static int rm = 1; /* Units Joules */
-    private static int forceCutDistance = 5;
-    private static double dt = 1;
+    private static double epsilon = 2; /* Units Joules */
+    private static double rm = 1; /* Units Joules */
+    private static double forceCutDistance = 5;
     private static double deltaT = Math.pow(10, -5);
-    private static double k = Math.pow(10,4); /* measured in N/m [Elastic constant]*/
-    private static double gamma = 100; /* measured in kg/s [Coefficient]*/
     private static double tf = 1;
 
     private List<Particle> particles;
@@ -43,31 +40,61 @@ public class Engine{
 //        addPreviousPositionsWithEuler();
     }
 
+//
+//    public List<Particle> addParticles() {
+//
+//        /* Add small particles */
+//        for (int i = 0; i < numberOfParticles; i++){
+//
+//            double x;
+//            double y;
+//
+//            do {
+//                x = radius + (boxWidth/2 - 2 * radius) * Math.random();
+//                y = radius + (boxHeight - 2 * radius) * Math.random();
+//            }
+//            while (isSuperimposed(x,y, particles));
+//
+//            Random r = new Random();
+//            int rangeMin = 0;
+//            int rangeMax = 0;
+//            double angle = rangeMin + (rangeMax - rangeMin) * r.nextDouble();
+//
+//            double vx = velocity * Math.cos(angle);
+//            double vy = velocity * Math.sin(angle);
+//
+//            particles.add(new Particle(i, x, y, 0,0, vx, vy, mass, radius));
+//        }
+//
+//
+//        return particles;
+//    }
 
     public List<Particle> addParticles() {
 
         /* Add small particles */
-        for (int i = 0; i < numberOfParticles; i++){
+//        for (int i = 0; i < numberOfParticles; i++){
 
             double x;
             double y;
 
-            do {
-                x = radius + (boxWidth/2 - 2 * radius) * Math.random();
-                y = radius + (boxHeight - 2 * radius) * Math.random();
-            }
-            while (isSuperimposed(x,y, particles));
+//            do {
+//                x = radius + (boxWidth/2 - 2 * radius) * Math.random();
+//                y = radius + (boxHeight - 2 * radius) * Math.random();
+//            }
+//            while (isSuperimposed(x,y, particles));
+//
+//            Random r = new Random();
+//            int rangeMin = 0;
+//            int rangeMax = 0;
+//            double angle = rangeMin + (rangeMax - rangeMin) * r.nextDouble();
+//
+//            double vx = velocity * Math.cos(angle);
+//            double vy = velocity * Math.sin(angle);
 
-            Random r = new Random();
-            int rangeMin = 0;
-            int rangeMax = 0;
-            double angle = rangeMin + (rangeMax - rangeMin) * r.nextDouble();
-
-            double vx = velocity * Math.cos(angle);
-            double vy = velocity * Math.sin(angle);
-
-            particles.add(new Particle(i, x, y, 0,0, vx, vy, mass, radius));
-        }
+            particles.add(new Particle(0, 100, 50, 0,0, 0, 0, mass, radius));
+            particles.add(new Particle(1, 100 + 4, 50, 0,0, 0, 0, mass, radius));
+//        }
 
 
         return particles;
@@ -85,10 +112,10 @@ public class Engine{
     }
 
     public void start(String path) {
-        int t = 0;
+        double t = 0;
         double particleDistance;
-        PointAndDistance distanceToHorizontalWall, distanceToVerticalWall, distanceToMiddleWall;
         int count = 0;
+        int index = 0;
 
         while (t < time) {
             /* me fijo particula por particula  que particulas estan en mi radio de accion para calcular
@@ -170,7 +197,7 @@ public class Engine{
                 Particle middleWall = new Particle(boxWidth/2, y, radius);
                 particleDistance = Particle.borderDistanceBetweenParticles(p1,middleWall);
                 if(particleDistance <= forceCutDistance){
-                    System.out.println("Pared del medio");
+//                    System.out.println("Pared del medio particle { x = " + p1.getX() + " " + p1.getY() + " } wall : { x = "+ middleWall.getX() + " y= "+ middleWall.getY());
                     setParticleForce(p1, particleDistance, middleWall.getX(),middleWall.getY());
 
                 }
@@ -180,14 +207,31 @@ public class Engine{
                 if(p1.getPrevX() == 0){
                     setPreviousPositionWithEuler(p1);
                 } else {
-                    startVerlet(p1);
+                    verlet(p1);
                 }
+
+
+                Particle p = p1;
+                if(p.getFx() == Double.NaN) {
+                    System.out.println("hola");
+                }
+                if(p.getId() == 0)
+                    System.out.println("PARTICLE " + p.getId() + ", X = " + p.getX() +", Fx = " + p.getFx() + ", Fy = " + p.getFy());
+
+//                System.out.println("CUENTA: " + count++);
+//                System.out.println();
+//                System.out.println();
+//                System.out.println("Time = "+ t + "| Count = "+ count +"| Particle { id = "+ p1.getId() + ", x = " + p1.getX() + ", y = " + p1.getY() + " }");
             }
 
-            t += dt;
+            t += deltaT;
             String toWrite = generateFileString(particles);
+
 //            System.out.println(toWrite);
-            Engine.writeToFile(toWrite,count++, path);
+            if(count == 0 || count % 1000 == 0){
+                Engine.writeToFile(toWrite,index++, path);
+            }
+            count++;
         }
     }
 
@@ -204,12 +248,12 @@ public class Engine{
         StringBuilder builder = new StringBuilder()
                 .append(particles.size())
                 .append("\r\n")
-                .append("//ID\t X\t Y\t Radius\t\r\n")
-                .append("-1 0 0 1\r\n")
-                .append("-1 0 200 1\r\n")
-                .append("-1 400 200 1\r\n")
-                .append("-1 400 0 1\r\n")
-                .append(addMiddleWallInGraph());
+                .append("//ID\t X\t Y\t Radius\t\r\n");
+//                .append("-1 0 0 1\r\n")
+//                .append("-1 0 200 1\r\n")
+//                .append("-1 400 200 1\r\n")
+//                .append("-1 400 0 1\r\n")
+//                .append(addMiddleWallInGraph());
         for(Particle current: particles) {
             builder.append(current.getId())
                     .append(" ")
@@ -240,6 +284,13 @@ public class Engine{
         double fy = force * e.getY();
         p.setFx(p.getFx() + fx);
         p.setFy(p.getFy() + fy);
+
+        if( p.getFx() == Double.NaN || fx == Double.NaN || fy == Double.NaN){
+            System.out.println("mamaaaa");
+        }
+
+//        if(p.getId() == 0)
+//            System.out.println("PARTICLE " + p.getId() + ", X = " + p.getX() + ", DISTANCE = " + distance + ", F = " + force +", Fx = " + fx + ", Fy = " + fy);
     }
 
 
@@ -253,55 +304,38 @@ public class Engine{
     }
 
     public Point calculatePolarity(Particle p1, double x, double y){
-        double ex = (x - p1.getX())/ Math.sqrt((p1.getX() - x) * (p1.getX() - x) + (p1.getY() - y) * (p1.getY() - y));
-        double ey = (y - p1.getY())/ Math.sqrt((p1.getX() - x) * (p1.getX() - x) + (p1.getY() - y) * (p1.getY() - y));
+        double ex = (p1.getX() - x)/ Math.sqrt(Math.pow((p1.getX() + x),2) - (Math.pow((p1.getY() + y),2)));
+        double ey = (p1.getY() - y)/ Math.sqrt(Math.pow((p1.getX() + x),2) - (Math.pow((p1.getY() + y),2)));
 
         return new Point(ex, ey);
     }
 
     /* VERLET */
 
-    public void startVerlet(Particle particle){
-        double time = 0;
-        int iteration = 0;
 
-
-        while(time <= tf){
-            verlet(particle);
-            iteration ++;
-            time += deltaT;
-
-        }
-//        System.out.println("Iteration: "+ iteration +" Time: " + (time-deltaT) + " Position: { x = " + particle.getX() + " y=" + particle.getY() + " }");
-    }
-
-
-    private Point verlet(Particle particle){
+    private void verlet(Particle particle){
         double rx = particle.getX();
         double ry = particle.getY();
         double newX = (2*rx) - particle.getPrevX() + ((Math.pow(deltaT,2)*particle.getFx())/mass);
         double newY = (2*ry) - particle.getPrevY() + ((Math.pow(deltaT,2)*particle.getFy())/mass);
+        if( newX == Double.NaN || newY == Double.NaN ){
+            System.out.println("mierda");
+        }
         particle.setX(newX);
         particle.setY(newY);
         particle.setPrevX(rx);
         particle.setPrevY(ry);
-        return new Point(rx, ry);
     }
 
     private void setPreviousPositionWithEuler(Particle p){
 
         double posX = p.getX() - deltaT * p.getVx();
         double posY = p.getY() - deltaT * p.getVy();
-        posX -= Math.pow(deltaT, 2) * p.getFx() / (2 * mass);
-        posY -= Math.pow(deltaT, 2) * p.getFy() / (2 * mass);
+        posX += Math.pow(deltaT, 2) * p.getFx() / (2 * mass);
+        posY += Math.pow(deltaT, 2) * p.getFy() / (2 * mass);
         p.setPrevX(posX);
         p.setPrevY(posY);
 //        de aca no salen los negativos, chequeado
-
-    }
-
-//    esto no se cuando usarlo porque la formula de la fuerza LJ no depende de la velocidad
-    private void setPreviousAccelerationWithEuler (Particle p){
 
     }
 
