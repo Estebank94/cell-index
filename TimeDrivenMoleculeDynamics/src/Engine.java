@@ -27,7 +27,9 @@ public class Engine{
     private static double epsilon = 2; /* Units Joules */
     private static double rm = 1; /* Units Joules */
     private static double forceCutDistance = 5;
-    private static double deltaT = Math.pow(10, -5);
+    private static double deltaT = Math.pow(10, -4);
+
+    private List<Point> particlesOnEachSide;
 
     private List<Particle> particles;
 
@@ -35,6 +37,7 @@ public class Engine{
         this.numberOfParticles = numberOfParticles;
         this.time = time;
         particles = new ArrayList<>();
+        particlesOnEachSide = new ArrayList<>();
         addParticles();
     }
 
@@ -189,33 +192,37 @@ public class Engine{
                     verlet(p1);
                 }
 
+                if(particlesOnEachSide.size() < count + 1) {
+                    particlesOnEachSide.add(new Point(0,0));
+                }
+                Point point = particlesOnEachSide.get(count);
+
+                if(p1.getX() > boxWidth / 2) {
+                    point.setY(point.getY() + 1);
+                } else {
+                    point.setX(point.getX() + 1);
+                }
 
                 Particle p = p1;
-//                if(p.getId() == 0 && count % 100 == 0)
-//                    System.out.println("PARTICLE " + p.getId() + ", X = " + p.getX() +", Fx = " + p.getFx() + ", Fy = " + p.getFy() + " || COUNT: " + count);
-
-
-//                System.out.println("CUENTA: " + count++);
-//                System.out.println();
-//                System.out.println();
-//                System.out.println("Time = "+ t + "| Count = "+ count +"| Particle { id = "+ p1.getId() + ", x = " + p1.getX() + ", y = " + p1.getY() + " }");
-
                 K+= 0.5 * mass * Math.sqrt(p.getVx() * p.getVx() + p.getVy() * p.getVy());
                 U+= calculateLJPotential(calculateDistance(p.getX(), p.getY(), p.getPrevX(), p.getPrevY()));
             }
 
-            System.out.println("Kinetic Energy= " + K + " Potential Energy = " + U + " Total Energy = " + K + U);
+//            System.out.println("Left: " + particlesOnEachSide.get(count).getX() + "Right" + particlesOnEachSide.get(count).getY());
+//            System.out.println("Kinetic Energy= " + K + " Potential Energy = " + U + " Total Energy = " + K + U);
             K = 0;
             U = 0;
             t += deltaT;
-            String toWrite = generateFileString(particles);
 
 //            System.out.println(toWrite);
-            if(count == 0 || count % 1000 == 0){
+            if(count == 0 || count % 100 == 0){
+                String toWrite = generateFileString(particles);
                 Engine.writeToFile(toWrite,index++, path);
             }
             count++;
         }
+
+        generateParticlesOnEachSideFile(path);
     }
 
     public static void writeToFile(String data, int index, String path){
@@ -323,6 +330,28 @@ public class Engine{
         p.setPrevY(posY);
 //        de aca no salen los negativos, chequeado
 
+    }
+
+    public void generateParticlesOnEachSideFile(String path) {
+        int i = 0;
+        StringBuilder builder = new StringBuilder()
+                .append(particles.size())
+                .append("\r\n")
+                .append("//Time\t Left\t Right\t\r\n");
+        for(Point current: particlesOnEachSide) {
+            builder.append(i++ * deltaT)
+                    .append(" ")
+                    .append(current.getX())
+                    .append(" ")
+                    .append(current.getY())
+                    .append("\r\n");
+        }
+
+        try {
+            Files.write(Paths.get(path  + "/particlesOnEachSide.txt"), builder.toString().getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
