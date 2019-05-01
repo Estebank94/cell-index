@@ -87,6 +87,7 @@ public class Engine{
         double particleDistance;
         int count = 0;
         int index = 0;
+        List<Point> energy = new ArrayList<>();
 
         while (t < time) {
             /* me fijo particula por particula  que particulas estan en mi radio de accion para calcular
@@ -206,16 +207,17 @@ public class Engine{
                 Particle p = p1;
                 K+= 0.5 * mass * Math.sqrt(p.getVx() * p.getVx() + p.getVy() * p.getVy());
                 U+= calculateLJPotential(calculateDistance(p.getX(), p.getY(), p.getPrevX(), p.getPrevY()));
-            }
 
+            }
+            energy.add(new Point(K,U));
 //            System.out.println("Left: " + particlesOnEachSide.get(count).getX() + "Right" + particlesOnEachSide.get(count).getY());
 //            System.out.println("Kinetic Energy= " + K + " Potential Energy = " + U + " Total Energy = " + K + U);
             K = 0;
             U = 0;
             t += deltaT;
 
-//            System.out.println(toWrite);
-            if(count == 0 || count % 100 == 0){
+            if(count == 0 || count % 1000 == 0){
+                System.out.println(t);
                 String toWrite = generateFileString(particles);
                 Engine.writeToFile(toWrite,index++, path);
             }
@@ -223,11 +225,21 @@ public class Engine{
         }
 
         generateParticlesOnEachSideFile(path);
+        String e = generateEnergyString(energy);
+        Engine.writeToEnergyFile(e, path);
     }
 
     public static void writeToFile(String data, int index, String path){
         try {
             Files.write(Paths.get(path  + "/result" + index + ".txt"), data.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void writeToEnergyFile(String data, String path){
+        try {
+            Files.write(Paths.get(path  + "/energy.txt"), data.getBytes());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -252,6 +264,19 @@ public class Engine{
                     .append(current.getY())
                     .append(" ")
                     .append(current.getRadius()+"\r\n");
+        }
+        return builder.toString();
+    }
+
+    public static String generateEnergyString(List<Point> energy) {
+        StringBuilder builder = new StringBuilder()
+                .append("\r\n")
+                .append("K\t U\t");
+        for(Point e : energy) {
+            builder.append(e.getX())
+                    .append("\t")
+                    .append(e.getY())
+                    .append("\t");
         }
         return builder.toString();
     }
