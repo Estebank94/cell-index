@@ -206,7 +206,7 @@ public class Engine{
                 }
 
                 Particle p = p1;
-                K+= 0.5 * mass * Math.sqrt(p.getVx() * p.getVx() + p.getVy() * p.getVy());
+                K+= 0.5 * mass * Math.pow(Math.sqrt(p.getVx() * p.getVx() + p.getVy() * p.getVy()),2);
             }
             for(Particle p1 : particles){
                 for(Particle p2: particles){
@@ -223,7 +223,8 @@ public class Engine{
             t += deltaT;
 
             if(count == 0 || count % 100 == 0){
-//                System.out.println(t);
+                System.out.println(t + " " + (energy.get(energy.size()-1).getX() +
+                        energy.get(energy.size()-1).getY()));
                 String toWrite = generateFileString(particles);
                 Engine.writeToFile(toWrite,index++, path);
             }
