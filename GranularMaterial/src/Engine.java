@@ -21,10 +21,6 @@ public class Engine {
     double mass = 0.01;
     public Set<Particle> particles;
 
-    /* Constants */
-    double kN = Math.pow(10,5);
-    double kT = 2;
-    double gamma = 70;
 
     public Engine(){
         particles = new HashSet<>();
@@ -62,9 +58,6 @@ public class Engine {
         }
         return false;
     }
-
-
-
 
 
 
