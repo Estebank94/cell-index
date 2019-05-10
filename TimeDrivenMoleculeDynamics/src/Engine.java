@@ -27,7 +27,7 @@ public class Engine{
     private static double epsilon = 2; /* Units Joules */
     private static double rm = 1; /* Units Joules */
     private static double forceCutDistance = 5;
-    private static double deltaT = Math.pow(10, -4);
+    private static double deltaT = Math.pow(10, -5);
 
     private List<Point> particlesOnEachSide;
 
@@ -216,10 +216,11 @@ public class Engine{
             U = 0;
             t += deltaT;
 
+//            System.out.println(toWrite);
             if(count == 0 || count % 1000 == 0){
-                System.out.println(t);
                 String toWrite = generateFileString(particles);
                 Engine.writeToFile(toWrite,index++, path);
+                System.out.println(t);
             }
             count++;
         }
