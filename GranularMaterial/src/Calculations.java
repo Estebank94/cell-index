@@ -19,12 +19,18 @@ public class Calculations {
     }
 
     private double derivateOverlap(Particle p1, Particle p2){
-        //what?
-        
+        if(overlap(p1, p2) > 0) {
+            return absoluteVelocity(p1,p2);
+        }
+        return 0;
     }
 
     private static double absoluteDistance(Particle p1, Particle p2) {
         return Math.sqrt(Math.pow((p1.getX() - p2.getX()),2) + (Math.pow((p1.getY() - p2.getY()),2)));
+    }
+
+    private static double absoluteVelocity(Particle p1, Particle p2) {
+        return Math.sqrt(Math.pow((p1.getVx() - p2.getVx()),2) + (Math.pow((p1.getVy() - p2.getVy()),2)));
     }
 
 
