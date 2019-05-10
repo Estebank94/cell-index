@@ -89,6 +89,7 @@ public class Engine{
         int index = 0;
         List<Point> energy = new ArrayList<>();
 
+
         while (t < time) {
             /* me fijo particula por particula  que particulas estan en mi radio de accion para calcular
              * la fuerza entre mi particula y las otras particulas en el radio*/
@@ -205,19 +206,25 @@ public class Engine{
                 }
 
                 Particle p = p1;
-                K+= 0.5 * mass * Math.sqrt(p.getVx() * p.getVx() + p.getVy() * p.getVy());
-                U+= calculateLJPotential(calculateDistance(p.getX(), p.getY(), p.getPrevX(), p.getPrevY()));
-
+                K+= 0.5 * mass * Math.pow(Math.sqrt(p.getVx() * p.getVx() + p.getVy() * p.getVy()),2);
+            }
+            for(Particle p1 : particles){
+                for(Particle p2: particles){
+                    double distance = Particle.borderDistanceBetweenParticles(p1,p2);
+                    if(distance > 1){
+                        U+=calculateLJPotential(distance);
+                    }
+                }
             }
             energy.add(new Point(K,U));
-//            System.out.println("Left: " + particlesOnEachSide.get(count).getX() + "Right" + particlesOnEachSide.get(count).getY());
-//            System.out.println("Kinetic Energy= " + K + " Potential Energy = " + U + " Total Energy = " + K + U);
+            System.out.println(K+U);
             K = 0;
             U = 0;
             t += deltaT;
 
-//            System.out.println(toWrite);
-            if(count == 0 || count % 1000 == 0){
+            if(count == 0 || count % 100 == 0){
+                System.out.println(t + " " + (energy.get(energy.size()-1).getX() +
+                        energy.get(energy.size()-1).getY()));
                 String toWrite = generateFileString(particles);
                 Engine.writeToFile(toWrite,index++, path);
                 System.out.println(t);
@@ -228,6 +235,7 @@ public class Engine{
         generateParticlesOnEachSideFile(path);
         String e = generateEnergyString(energy);
         Engine.writeToEnergyFile(e, path);
+
     }
 
     public static void writeToFile(String data, int index, String path){
@@ -251,7 +259,7 @@ public class Engine{
         StringBuilder builder = new StringBuilder()
                 .append(particles.size())
                 .append("\r\n")
-                .append("//ID\t X\t Y\t Radius\t\r\n")
+                .append("//ID\t X\t Y\t Vx\t Vy\t Radius\t\r\n ")
                 .append("-1 0 0 1\r\n")
                 .append("-1 0 200 1\r\n")
                 .append("-1 400 200 1\r\n")
@@ -264,7 +272,11 @@ public class Engine{
                     .append(" ")
                     .append(current.getY())
                     .append(" ")
-                    .append(current.getRadius()+"\r\n");
+                    .append(current.getVx())
+                    .append(" ")
+                    .append(current.getVy())
+                    .append(" ")
+                    .append(current.getRadius() +"\r\n");
         }
         return builder.toString();
     }
@@ -288,7 +300,7 @@ public class Engine{
             if(y <= boxHeight/2 - openingSize /2 || y >= (boxHeight - boxHeight/2 + openingSize/2)){
                 builder.append("-1 " + boxWidth/2 + " " + y + " 1\r\n");
             }
-            y+=20;
+            y+=3;
         }
         return builder.toString();
     }
@@ -311,8 +323,12 @@ public class Engine{
         return epsilon * (Math.pow(rm/distanceP1P2,12) - 2 * Math.pow(rm/distanceP1P2, 6));
     }
 
+//    public double calculateDistance(double x1, double y1, double x2, double y2) {
+//        return Math.sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
+//    }
+
     public double calculateDistance(double x1, double y1, double x2, double y2) {
-        return Math.sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
+        return Math.sqrt(Math.pow((x2-x1),2) + Math.pow((y2-y1),2));
     }
 
     public double calculateLJForce(double distanceP1P2) {
@@ -354,8 +370,6 @@ public class Engine{
         posY += Math.pow(deltaT, 2) * p.getFy() / (2 * mass);
         p.setPrevX(posX);
         p.setPrevY(posY);
-//        de aca no salen los negativos, chequeado
-
     }
 
     public void generateParticlesOnEachSideFile(String path) {
