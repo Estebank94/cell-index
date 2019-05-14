@@ -1,8 +1,6 @@
 import java.util.*;
 
-/**
- * Created by estebankramer on 10/05/2019.
- */
+
 public class CIM {
 
     private Cell[][] grid;

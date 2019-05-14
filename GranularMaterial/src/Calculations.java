@@ -1,6 +1,4 @@
-/**
- * Created by estebankramer on 10/05/2019.
- */
+
 public class Calculations {
 
     /* Constants */
@@ -32,7 +30,6 @@ public class Calculations {
     private static double absoluteVelocity(Particle p1, Particle p2) {
         return Math.sqrt(Math.pow((p1.getVx() - p2.getVx()),2) + (Math.pow((p1.getVy() - p2.getVy()),2)));
     }
-
 
     /* N1 */
     private double getFn(double overlaping, double derivOverlap) {

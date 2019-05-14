@@ -3,26 +3,27 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-/**
- * Created by estebankramer on 10/05/2019.
- */
+
 
 public class Engine {
 
     /* Silo dimensions */
-    double W = 0.3;
-    double L = 1;
-    double D = 0.15;
+    private double W = 0.3;
+    private double L = 1;
+    private double D = 0.15;
+    private double time = 0;
 
     /* Particles */
-    int maxParticles = 500;
-    double minRadius = 0.02;
-    double maxRadius = 0.03;
-    double mass = 0.01;
+    private int maxParticles = 500;
+    private double minRadius = 0.02;
+    private double maxRadius = 0.03;
+    private double mass = 0.01;
     public Set<Particle> particles;
 
+    private double deltaT;
 
-    public Engine(){
+
+    public Engine() {
         particles = new HashSet<>();
         addParticles();
     }
@@ -45,6 +46,7 @@ public class Engine {
 
         if(!isSuperimposed(p)){
             particles.add(p);
+            maxParticles--;
         }
     }
 
@@ -59,6 +61,56 @@ public class Engine {
         return false;
     }
 
+    public void start (String outPath, double finalTime){
+
+        int iterations = 0;
+        while(time < finalTime && iterations < 100000){
+            for(Particle p : particles){
+                if(time == 0){
+                    setPreviousPositionWithEuler(p);
+                }else{
+                    verlet(p);
+                }
+            }
+
+            if(iterations % 100 == 0){
+                System.out.println("Time: " + time + " Iterations: " + iterations);
+            }
+
+            time +=deltaT;
+            iterations++;
+        }
+
+    }
+
+    /* VERLET */
+
+    private void verlet(Particle particle){
+        double rx = particle.getX();
+        double ry = particle.getY();
+        double newX = (2*rx) - particle.getPrevX() + ((Math.pow(deltaT,2)*particle.getFx())/mass);
+        double newY = (2*ry) - particle.getPrevY() + ((Math.pow(deltaT,2)*particle.getFy())/mass);
+        double newVx = (newX - particle.getPrevX())/(2*deltaT);
+        double newVy = (newY - particle.getPrevY())/(2*deltaT);
+        particle.setX(newX);
+        particle.setY(newY);
+        particle.setVx(newVx);
+        particle.setVy(newVy);
+        particle.setPrevX(rx);
+        particle.setPrevY(ry);
+        particle.setFx(0);
+        particle.setFy(0);
+    }
+
+    private void setPreviousPositionWithEuler(Particle p){
+
+        double posX = p.getX() - deltaT * p.getVx();
+        double posY = p.getY() - deltaT * p.getVy();
+        posX += Math.pow(deltaT, 2) * p.getFx() / (2 * mass);
+        posY += Math.pow(deltaT, 2) * p.getFy() / (2 * mass);
+        p.setPrevX(posX);
+        p.setPrevY(posY);
+    }
 
 
 }
