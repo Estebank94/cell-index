@@ -5,10 +5,6 @@ public class Vector2D {
     final double x;
     final double y;
 
-    public static Vector2D of(final double x, final double y) {
-        return new Vector2D(x, y);
-    }
-
     public Vector2D(final double x, final double y) {
         this.x = x;
         this.y = y;

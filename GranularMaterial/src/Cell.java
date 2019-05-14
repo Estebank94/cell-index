@@ -1,9 +1,6 @@
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Created by estebankramer on 10/05/2019.
- */
 public class Cell {
     private int row;
     private int col;

@@ -1,8 +1,6 @@
 import java.util.HashSet;
-import java.util.List;
 import java.util.Random;
 import java.util.Set;
-
 
 
 public class Engine {
@@ -92,14 +90,10 @@ public class Engine {
         double newY = (2*ry) - particle.getPrevY() + ((Math.pow(deltaT,2)*particle.getFy())/mass);
         double newVx = (newX - particle.getPrevX())/(2*deltaT);
         double newVy = (newY - particle.getPrevY())/(2*deltaT);
-        particle.setX(newX);
-        particle.setY(newY);
-        particle.setVx(newVx);
-        particle.setVy(newVy);
-        particle.setPrevX(rx);
-        particle.setPrevY(ry);
-        particle.setFx(0);
-        particle.setFy(0);
+        particle.setPosition(new Vector2D(newX, newY));
+        particle.setVelocity(new Vector2D(newVx, newVy));
+        particle.setPrevPosition(new Vector2D(rx, ry));
+        particle.setForce(new Vector2D(0, 0));
     }
 
     private void setPreviousPositionWithEuler(Particle p){
@@ -108,8 +102,7 @@ public class Engine {
         double posY = p.getY() - deltaT * p.getVy();
         posX += Math.pow(deltaT, 2) * p.getFx() / (2 * mass);
         posY += Math.pow(deltaT, 2) * p.getFy() / (2 * mass);
-        p.setPrevX(posX);
-        p.setPrevY(posY);
+        p.setPrevPosition(new Vector2D(posX, posY));
     }
 
 
