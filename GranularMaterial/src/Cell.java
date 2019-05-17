@@ -12,6 +12,10 @@ public class Cell {
         particles = new HashSet<>();
     }
 
+    public Cell(){
+        particles = new HashSet<>();
+    }
+
     public int getRow() {
         return row;
     }
