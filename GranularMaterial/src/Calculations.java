@@ -1,3 +1,4 @@
+import java.util.Set;
 
 public class Calculations {
 
@@ -7,37 +8,53 @@ public class Calculations {
     private final static double kT = 2 * kN;
     private final static double gamma = 70;
     private final static double mass = 0.01;
-    private final static double mu = 0.001; /* de donde sacan ese valor? */
-
-    private static double overlap(Particle p1, Particle p2 ){
-        double result = p1.getRadius() + p2.getRadius() - absoluteDistance(p1,p2);
 
 
-        return result > 0 ? result  : 0;
-    }
-
-    private double derivateOverlap(Particle p1, Particle p2){
-        if(overlap(p1, p2) > 0) {
-            return absoluteVelocity(p1,p2);
+    private void setForces(Particle p, Set<Particle> set) {
+        double fX = 0;
+        double fY = p.getMass() * g;
+        for (Particle particle : set) {
+            fX += getFN(p, particle) * getENX(p, particle) + getFT(p, particle) * (-(getENY(p, particle)));
+            fY += getFN(p, particle) * getENY(p, particle) + getFT(p, particle) * getENX(p, particle);
         }
-        return 0;
+        p.setFx(fX);
+        p.setFx(fY);
     }
+
 
     private static double absoluteDistance(Particle p1, Particle p2) {
         return Math.sqrt(Math.pow((p1.getX() - p2.getX()),2) + (Math.pow((p1.getY() - p2.getY()),2)));
     }
 
     private static double absoluteVelocity(Particle p1, Particle p2) {
-        return Math.sqrt(Math.pow((p1.getVx() - p2.getVx()),2) + (Math.pow((p1.getVy() - p2.getVy()),2)));
+        return Math.sqrt(Math.pow((p1.getVX() - p2.getVX()),2) + (Math.pow((p1.getVX() - p2.getVX()),2)));
     }
 
-    /* N1 */
-    private double getFn(double overlaping, double derivOverlap) {
-        return -kN * overlaping - gamma * derivOverlap;
+
+    private double getFN(Particle p, Particle o) {
+        return -kN * getEpsilon(p, o);
     }
 
-    /* T2 */
-    private double getFt(double Fn, double vrel) {
-        return - mu * Math.abs(Fn) * Math.signum(vrel);
+
+    private double getFT(Particle p, Particle o) {
+        return -kT * getEpsilon(p, o) * (((p.getVX() - o.getVX()) * (-getENY(p,o))));
+    }
+
+    private double getENY(Particle p, Particle o) {
+        return (o.getY() - p.getY()) / getDistance(o.getX(), o.getY(), p.getX(), p.getY());
+    }
+
+    private double getENX(Particle p, Particle o) {
+        return (o.getX() - p.getX()) / getDistance(o.getX(), o.getY(), p.getX(), p.getY());
+    }
+
+    private double getEpsilon(Particle p, Particle o) {
+        return p.getR() + o.getR() - (getDistance(p.getX(), p.getY(), o.getX(), o.getY()));
+    }
+
+    private double getDistance(double x0, double y0, double x1, double y1) {
+        return Math.sqrt(Math.pow(x0 - x1, 2) + Math.pow(y0 - y1, 2));
     }
 }
+
+

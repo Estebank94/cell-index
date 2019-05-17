@@ -113,35 +113,35 @@ public class Particle {
         this.prevY = prevY;
     }
 
-    public double getvX() {
+    public double getVX() {
         return vX;
     }
 
-    public void setvX(double vX) {
+    public void setVX(double vX) {
         this.vX = vX;
     }
 
-    public double getvY() {
+    public double getVY() {
         return vY;
     }
 
-    public void setvY(double vY) {
+    public void setVY(double vY) {
         this.vY = vY;
     }
 
-    public double getPrevVx() {
+    public double getPrevVX() {
         return prevVx;
     }
 
-    public void setPrevVx(double prevVx) {
+    public void setPrevVX(double prevVx) {
         this.prevVx = prevVx;
     }
 
-    public double getPrevVy() {
+    public double getPrevVY() {
         return prevVy;
     }
 
-    public void setPrevVy(double prevVy) {
+    public void setPrevVY(double prevVy) {
         this.prevVy = prevVy;
     }
 
