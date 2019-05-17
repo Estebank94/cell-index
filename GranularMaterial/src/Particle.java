@@ -1,203 +1,211 @@
-
 public class Particle {
+    private final int id;
+    private final double radius;
+    private final double mass;
 
-    final int id;
+    private final Vector2D previousAcceleration;
 
-    private double x;
-    private double y;
+    private final Vector2D position;
+    private final Vector2D speed;
 
-    private double prevX;
-    private double prevY;
+    private Vector2D acceleration;
 
-    private double vX;
-    private double vY;
+    private Vector2D nextPosition;
+    private Vector2D nextSpeedPredicted;
 
-    private double prevVx;
-    private double prevVy;
+    private Vector2D nextAcceleration;
 
-    private double prevAccX = 0;
-    private double prevAccY = 0;
+    private Vector2D nextSpeedCorrected;
 
-    private Double fx = null;
-    private Double fy = null;
+    private double totalFn;
 
-    double[] rListX = new double[6];
-    double[] rListY = new double[6];
 
-    final double mass;
-    final double r;
 
-    public Particle(int id, double x, double y, double prevX, double prevY, double vX, double vY, double prevVx, double prevVy, double mass, double r) {
+
+    private Particle(Particle p, Vector2D position, Vector2D speed, Vector2D previousAcc){
+        this.id=p.id;
+        this.mass=p.mass;
+        this.radius=p.radius;
+
+        this.previousAcceleration=previousAcc;
+        this.speed=speed;
+        this.position=position;
+
+        this.nextPosition = new Vector2D();
+        this.nextSpeedPredicted = new Vector2D();
+        this.nextSpeedCorrected = new Vector2D();
+        this.acceleration = new Vector2D();
+        this.nextAcceleration = new Vector2D();
+        this.totalFn = 0;
+    }
+    public Particle(int id, double xPosition, double yPosition, double xSpeed, double ySpeed, double radius, double mass) {
         this.id = id;
-        this.x = x;
-        this.y = y;
-        this.prevX = prevX;
-        this.prevY = prevY;
-        this.vX = vX;
-        this.vY = vY;
-        this.prevVx = prevVx;
-        this.prevVy = prevVy;
+        this.radius = radius;
         this.mass = mass;
-        this.r = r;
+
+        this.previousAcceleration = Vector2D.of(0,0);
+        this.position = Vector2D.of(xPosition,yPosition);
+        this.speed =  Vector2D.of(xSpeed,ySpeed);
+        this.nextPosition = new Vector2D();
+        this.nextSpeedPredicted = new Vector2D();
+        this.nextSpeedCorrected = new Vector2D();
+        this.acceleration = new Vector2D();
+        this.nextAcceleration = new Vector2D();
+
     }
 
-    public Particle(int id, double x, double y, double prevX, double prevY, double vX, double vY, double mass, double r) {
-        this.id = id;
-        this.x = x;
-        this.y = y;
-        this.prevX = prevX;
-        this.prevY = prevY;
-        this.vX = vX;
-        this.vY = vY;
-        this.mass = mass;
-        this.r = r;
-    }
 
-    public Particle(int id, double x, double y, double vX, double vY, double mass, double r) {
-        this.id = id;
-        this.x = x;
-        this.y = y;
-        this.vX = vX;
-        this.vY = vY;
-        this.mass = mass;
-        this.r = r;
-    }
 
-    public Particle(int id, double prevX, double prevY, double mass, double r) {
-        this.id = id;
-        this.prevX = prevX;
-        this.prevY = prevY;
-        this.mass = mass;
-        this.r = r;
-    }
-
-    public Particle(int id, double mass, double r) {
-        this.id = id;
-        this.mass = mass;
-        this.r = r;
+    public static Particle of(Particle p, Vector2D position, Vector2D speed, Vector2D previousAcc){
+        return new Particle(p,position,speed,previousAcc);
     }
 
     public int getId() {
         return id;
     }
 
-    public double getX() {
-        return x;
+    public Vector2D getPosition() {
+        return position;
     }
 
-    public void setX(double x) {
-        this.x = x;
+    public Vector2D getSpeed() {
+        return speed;
     }
 
-    public double getY() {
-        return y;
-    }
-
-    public void setY(double y) {
-        this.y = y;
-    }
-
-    public double getPrevX() {
-        return prevX;
-    }
-
-    public void setPrevX(double prevX) {
-        this.prevX = prevX;
-    }
-
-    public double getPrevY() {
-        return prevY;
-    }
-
-    public void setPreY(double prevY) {
-        this.prevY = prevY;
-    }
-
-    public double getVX() {
-        return vX;
-    }
-
-    public void setVX(double vX) {
-        this.vX = vX;
-    }
-
-    public double getVY() {
-        return vY;
-    }
-
-    public void setVY(double vY) {
-        this.vY = vY;
-    }
-
-    public double getPrevVX() {
-        return prevVx;
-    }
-
-    public void setPrevVX(double prevVx) {
-        this.prevVx = prevVx;
-    }
-
-    public double getPrevVY() {
-        return prevVy;
-    }
-
-    public void setPrevVY(double prevVy) {
-        this.prevVy = prevVy;
-    }
-
-    public double getPrevAccX() {
-        return prevAccX;
-    }
-
-    public void setPrevAccX(double prevAccX) {
-        this.prevAccX = prevAccX;
-    }
-
-    public double getPrevAccY() {
-        return prevAccY;
-    }
-
-    public void setPrevAccY(double prevAccY) {
-        this.prevAccY = prevAccY;
-    }
-
-    public Double getFx() {
-        return fx;
-    }
-
-    public void setFx(Double fx) {
-        this.fx = fx;
-    }
-
-    public Double getFy() {
-        return fy;
-    }
-
-    public void setFy(Double fy) {
-        this.fy = fy;
-    }
-
-    public double[] getrListX() {
-        return rListX;
-    }
-
-    public void setrListX(double[] rListX) {
-        this.rListX = rListX;
-    }
-
-    public double[] getrListY() {
-        return rListY;
-    }
-
-    public void setrListY(double[] rListY) {
-        this.rListY = rListY;
+    public double getRadius() {
+        return radius;
     }
 
     public double getMass() {
         return mass;
     }
 
-    public double getR() {
-        return r;
+    public Vector2D getPreviousAcceleration() {
+        return previousAcceleration;
+    }
+
+    public Vector2D getAcceleration() {
+        if(!acceleration.isInitialized()) {
+            throw new IllegalStateException();
+        }
+        return acceleration;
+    }
+
+    public Vector2D getNextAcceleration() {
+        if(!nextAcceleration.isInitialized()) {
+            throw new IllegalStateException();
+        }
+        return nextAcceleration;
+    }
+
+    public Vector2D getNextPosition() {
+        if(!nextPosition.isInitialized()) {
+            throw new IllegalStateException();
+        }
+        return nextPosition;
+    }
+
+    public Vector2D getNextSpeedPredicted() {
+        if(!nextSpeedPredicted.isInitialized()) {
+            throw new IllegalStateException();
+        }
+        return nextSpeedPredicted;
+    }
+
+    public Vector2D getNextSpeedCorrected() {
+        if(!nextSpeedCorrected.isInitialized()) {
+            throw new IllegalStateException();
+        }
+        return nextSpeedCorrected;
+    }
+
+
+
+    public void setNextPosition(Vector2D nextPosition){
+        if(this.nextPosition.isInitialized()){
+            throw new IllegalStateException();
+        }else{
+            this.nextPosition = nextPosition;
+        }
+    }
+
+    public void setNextSpeedCorrected(Vector2D nextVelocity){
+        if(this.nextSpeedCorrected.isInitialized()){
+            throw new IllegalStateException();
+        }else{
+            this.nextSpeedCorrected = nextVelocity;
+        }
+    }
+
+    public void setNextSpeedPredicted(Vector2D nextVelocity){
+        if(this.nextSpeedPredicted.isInitialized()){
+            throw new IllegalStateException();
+        }else{
+            this.nextSpeedPredicted = nextVelocity;
+        }
+    }
+
+    public void setNextAcceleration(Vector2D nextAcceleration){
+        if(this.nextAcceleration.isInitialized()){
+            throw new IllegalStateException();
+        }else{
+            this.nextAcceleration = nextAcceleration;
+        }
+    }
+
+    public boolean overlaps(Particle other) {
+        double distance = this.position.distance(other.position);
+
+        if(distance < radius + other.radius) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public void setAcceleration(Vector2D acceleration){
+        if(this.acceleration.isInitialized()){
+            throw new IllegalStateException();
+        }else{
+            this.acceleration = acceleration;
+        }
+    }
+
+    public double getTotalFn() {
+        return totalFn;
+    }
+
+    public void setTotalFn(double totalFn) {
+        if (this.totalFn == 0) {
+            this.totalFn = totalFn;
+        }
+    }
+
+    public void clearFn() {
+        this.totalFn = 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Particle)) return false;
+
+        Particle particle = (Particle) o;
+
+        if (getId() != particle.getId()) return false;
+        if (Double.compare(particle.getRadius(), getRadius()) != 0) return false;
+        return Double.compare(particle.getMass(), getMass()) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        result = getId();
+        temp = Double.doubleToLongBits(getRadius());
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(getMass());
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
     }
 }

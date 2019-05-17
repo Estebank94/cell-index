@@ -2,34 +2,23 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Cell {
-    private int row;
-    private int col;
+    private final int x;
+    private final int y;
     private Set<Particle> particles;
 
-    public Cell(int row, int col){
-        this.row = row;
-        this.col = col;
-        particles = new HashSet<>();
+    public Cell(int x, int y) {
+        this.x = x;
+        this.y = y;
+
+        this.particles = new HashSet<>();
     }
 
-    public Cell(){
-        particles = new HashSet<>();
+    public int getX() {
+        return x;
     }
 
-    public int getRow() {
-        return row;
-    }
-
-    public void setRow(int row) {
-        this.row = row;
-    }
-
-    public int getCol() {
-        return col;
-    }
-
-    public void setCol(int col) {
-        this.col = col;
+    public int getY() {
+        return y;
     }
 
     public Set<Particle> getParticles() {
@@ -40,7 +29,7 @@ public class Cell {
         particles.add(p);
     }
 
-    public void removeParticles() {
+    public void clearParticles() {
         particles.clear();
     }
 }
