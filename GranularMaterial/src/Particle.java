@@ -1,151 +1,203 @@
 
 public class Particle {
 
-    private int id;
-    private Vector2D position;
-    private Vector2D prevPosition;
-    private Vector2D velocity;
-    private double mass;
-    private double radius;
-    private Vector2D force;
-    private Vector2D prevForce;
-    private long updateCount;
+    final int id;
 
-    public Particle(int id, double x, double y, double vx, double vy, double mass, double radius) {
+    private double x;
+    private double y;
+
+    private double prevX;
+    private double prevY;
+
+    private double vX;
+    private double vY;
+
+    private double prevVx;
+    private double prevVy;
+
+    private double prevAccX = 0;
+    private double prevAccY = 0;
+
+    private Double fx = null;
+    private Double fy = null;
+
+    double[] rListX = new double[6];
+    double[] rListY = new double[6];
+
+    final double mass;
+    final double r;
+
+    public Particle(int id, double x, double y, double prevX, double prevY, double vX, double vY, double prevVx, double prevVy, double mass, double r) {
         this.id = id;
-        this.position = new Vector2D(x, y);
-        this.velocity = new Vector2D(vx, vy);
+        this.x = x;
+        this.y = y;
+        this.prevX = prevX;
+        this.prevY = prevY;
+        this.vX = vX;
+        this.vY = vY;
+        this.prevVx = prevVx;
+        this.prevVy = prevVy;
         this.mass = mass;
-        this.radius = radius;
-        this.updateCount = 0;
+        this.r = r;
     }
 
-    public Particle(double x, double y, double radius) {
-        this.position = new Vector2D(x, y);
-        this.radius = radius;
-    }
-
-    public Particle(int id, double x, double y, double prevX, double prevY, double vx, double vy, double mass, double radius) {
+    public Particle(int id, double x, double y, double prevX, double prevY, double vX, double vY, double mass, double r) {
         this.id = id;
-        this.position = new Vector2D(x, y);
-        this.prevPosition = new Vector2D(prevX, prevY);
-        this.velocity = new Vector2D(vx, vy);
+        this.x = x;
+        this.y = y;
+        this.prevX = prevX;
+        this.prevY = prevY;
+        this.vX = vX;
+        this.vY = vY;
         this.mass = mass;
-        this.radius = radius;
-        this.updateCount = 0;
-        this.force = new Vector2D(0, 0);
-        this.prevForce = new Vector2D(0, 0);
+        this.r = r;
     }
 
-    public double getX(){
-        return position.getX();
+    public Particle(int id, double x, double y, double vX, double vY, double mass, double r) {
+        this.id = id;
+        this.x = x;
+        this.y = y;
+        this.vX = vX;
+        this.vY = vY;
+        this.mass = mass;
+        this.r = r;
     }
 
-    public double getY(){
-        return position.getY();
+    public Particle(int id, double prevX, double prevY, double mass, double r) {
+        this.id = id;
+        this.prevX = prevX;
+        this.prevY = prevY;
+        this.mass = mass;
+        this.r = r;
     }
 
-    public double getPrevX(){
-        return prevPosition.getX();
-    }
-
-    public double getPrevY(){
-        return prevPosition.getY();
-    }
-
-    public double getVx(){
-        return velocity.getX();
-    }
-
-    public double getVy(){
-        return velocity.getY();
-    }
-
-    public double getFx(){
-        return force.getX();
-    }
-
-    public double getFy(){
-        return force.getY();
-    }
-
-    public double getPrevFx(){
-        return prevForce.getX();
-    }
-
-    public double getPrevFy(){
-        return prevForce.getY();
+    public Particle(int id, double mass, double r) {
+        this.id = id;
+        this.mass = mass;
+        this.r = r;
     }
 
     public int getId() {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public double getX() {
+        return x;
+    }
+
+    public void setX(double x) {
+        this.x = x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public void setY(double y) {
+        this.y = y;
+    }
+
+    public double getPrevX() {
+        return prevX;
+    }
+
+    public void setPrevX(double prevX) {
+        this.prevX = prevX;
+    }
+
+    public double getPrevY() {
+        return prevY;
+    }
+
+    public void setPrevY(double prevY) {
+        this.prevY = prevY;
+    }
+
+    public double getvX() {
+        return vX;
+    }
+
+    public void setvX(double vX) {
+        this.vX = vX;
+    }
+
+    public double getvY() {
+        return vY;
+    }
+
+    public void setvY(double vY) {
+        this.vY = vY;
+    }
+
+    public double getPrevVx() {
+        return prevVx;
+    }
+
+    public void setPrevVx(double prevVx) {
+        this.prevVx = prevVx;
+    }
+
+    public double getPrevVy() {
+        return prevVy;
+    }
+
+    public void setPrevVy(double prevVy) {
+        this.prevVy = prevVy;
+    }
+
+    public double getPrevAccX() {
+        return prevAccX;
+    }
+
+    public void setPrevAccX(double prevAccX) {
+        this.prevAccX = prevAccX;
+    }
+
+    public double getPrevAccY() {
+        return prevAccY;
+    }
+
+    public void setPrevAccY(double prevAccY) {
+        this.prevAccY = prevAccY;
+    }
+
+    public Double getFx() {
+        return fx;
+    }
+
+    public void setFx(Double fx) {
+        this.fx = fx;
+    }
+
+    public Double getFy() {
+        return fy;
+    }
+
+    public void setFy(Double fy) {
+        this.fy = fy;
+    }
+
+    public double[] getrListX() {
+        return rListX;
+    }
+
+    public void setrListX(double[] rListX) {
+        this.rListX = rListX;
+    }
+
+    public double[] getrListY() {
+        return rListY;
+    }
+
+    public void setrListY(double[] rListY) {
+        this.rListY = rListY;
     }
 
     public double getMass() {
         return mass;
     }
 
-    public void setMass(double mass) {
-        this.mass = mass;
-    }
-
-    public double getRadius() {
-        return radius;
-    }
-
-    public void setRadius(double radius) {
-        this.radius = radius;
-    }
-
-    public long getUpdateCount() {
-        return updateCount;
-    }
-
-    public void setUpdateCount(long updateCount) {
-        this.updateCount = updateCount;
-    }
-
-    public Vector2D getPosition() {
-        return position;
-    }
-
-    public void setPosition(Vector2D position) {
-        this.position = position;
-    }
-
-    public Vector2D getPrevPosition() {
-        return prevPosition;
-    }
-
-    public void setPrevPosition(Vector2D prevPosition) {
-        this.prevPosition = prevPosition;
-    }
-
-    public Vector2D getVelocity() {
-        return velocity;
-    }
-
-    public void setVelocity(Vector2D velocity) {
-        this.velocity = velocity;
-    }
-
-    public Vector2D getForce() {
-        return force;
-    }
-
-    public void setForce(Vector2D force) {
-        this.force = force;
-    }
-
-    public Vector2D getPrevForce() {
-        return prevForce;
-    }
-
-    public void setPrevForce(Vector2D prevForce) {
-        this.prevForce = prevForce;
+    public double getR() {
+        return r;
     }
 }
