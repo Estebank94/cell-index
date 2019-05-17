@@ -51,7 +51,7 @@ public class Engine {
     private boolean isSuperimposed(Particle p) {
 
         for (Particle p2: particles){
-            boolean superImposed = Math.pow(p2.getX() - p.getX(), 2) + Math.pow(p2.getY() - p.getY(), 2) <= Math.pow(p.getRadius() + p2.getRadius(), 2);
+            boolean superImposed = Math.pow(p2.getX() - p.getX(), 2) + Math.pow(p2.getY() - p.getY(), 2) <= Math.pow(p.getR() + p2.getR(), 2);
             if (superImposed){
                 return true;
             }

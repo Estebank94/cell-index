@@ -109,7 +109,7 @@ public class Particle {
         return prevY;
     }
 
-    public void setPrevY(double prevY) {
+    public void setPreY(double prevY) {
         this.prevY = prevY;
     }
 
