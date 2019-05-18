@@ -3,7 +3,9 @@ import java.util.Random;
 import java.util.Set;
 
 public class Silo {
+
     private Set<Particle> particles;
+
     private double L, W, D;
     private double time, dt;
     private final static int MAX_TRIES = 500;
@@ -35,7 +37,7 @@ public class Silo {
         int i = 0;
         int tries = 0;
         while(i < 1000 && tries < MAX_TRIES) {
-            if(addPartilce()) {
+            if(addParticle()) {
                 i++;
                 System.out.println(i);
                 tries = 0;
@@ -47,43 +49,48 @@ public class Silo {
         System.out.println(particles.size() + " particles added.");
     }
 
-    public void start(String outPath,double finalTime){
+    public void run(String outPath, double ft){
 
-        Beeman integrator = new Beeman(new ForceCalculator(L, W, D)
-            , new NeighbourCalculator(L,W,0, maxR), dt,particles);
+        double interactionR = 0;
+
+        Beeman beeman = new Beeman(new ForceCalculator(L, W, D)
+            ,new NeighbourCalculator(L,W,interactionR, maxR), dt,particles);
 
         Printer printer = new Printer(outPath, L, W, D);
-        timePrinter = new Printer(outPath+"_time", 0, 0, 0);
-        Printer energyPrinter = new Printer(outPath+"_energy", 0, 0, 0);
+        timePrinter = new Printer(outPath + "_time", 0, 0, 0);
+        Printer energyPrinter = new Printer(outPath + "_energy", 0, 0, 0);
 
-        int iterations = 0;
-        while(time < finalTime && iterations < 100000) {
+        int i = 0;
+        while(time < ft && i < 100000) {
 
-            this.particles = integrator.integrate(particles);
+            this.particles = beeman.integrate(particles);
 
             this.particles = removeFallenParticles(time);
 
-            if(iterations % printingStep == 0) {
+            if(i % printingStep == 0) {
                 printer.appendToFile(particles);
-                System.out.println("Time: " + time + "\t iterations: " + iterations);
+                System.out.println("Time: " + time + "\t Iterations: " + i);
             }
 
             getEnergy(energyPrinter);
 
             time += dt;
-            iterations++;
+            i++;
         }
 
     }
 
-    private boolean addPartilce() {
-        Random rand = new Random();
+    private boolean addParticle() {
+        Random r = new Random();
 
-        double radius = rand.nextDouble() * (maxR - minR) + minR;
-        double x = rand.nextDouble() * (W - 2 * radius) + radius;
-        double y = rand.nextDouble() * (L - 2 * radius) + radius;
+        double radius = r.nextDouble() * (maxR - minR) + minR;
+        double x = r.nextDouble() * (W - 2 * radius) + radius;
+        double y = r.nextDouble() * (L - 2 * radius) + radius;
 
-        Particle p = new Particle(particles.size(), x, y, 0,0, radius, mass);
+        double xSpeed = 0;
+        double ySpeed = 0;
+
+        Particle p = new Particle(particles.size(), x, y, xSpeed,ySpeed, radius, mass);
 
         for(Particle other : particles) {
             if(p.overlaps(other)) {
@@ -95,30 +102,31 @@ public class Silo {
         return true;
     }
 
-    private void addParticle(Particle oldParticle, Set<Particle> newParticles) {
+    private void addFallenParticles(Particle old, Set<Particle> newParticles) {
         Random rand = new Random();
         boolean done = false;
-        double radius = oldParticle.getRadius();
-        double x = 0, y = 0;
-        Particle p = oldParticle;
-
-
+        double r = old.getRadius();
+        double x;
+        double y;
+        Particle p = old;
 
         while(!done) {
-            x = rand.nextDouble() * (W - 2 * radius) + radius;
-            y = rand.nextDouble() * (L/8 - 2 * radius) + radius + L * 7.0/8;
+            x = rand.nextDouble() * (W - 2 * r) + r;
+            y = rand.nextDouble() * (L/8 - 2 * r) + r + L * 7.0/8;
 
-            p = new Particle(oldParticle.getId(), x, y, 0, 0, radius, mass);
+            double xSpeed = 0, ySpeed = 0;
 
-            done = !isOverlapingOtherParticle(p, this.particles);
+            p = new Particle(old.getId(), x, y, xSpeed, ySpeed, r, mass);
+
+            done = !isSuperimposed(p, this.particles);
         }
 
         newParticles.add(p);
     }
 
-    private boolean isOverlapingOtherParticle(Particle p, Set<Particle> newParticles) {
-        for(Particle other : newParticles) {
-            if(p.overlaps(other)) {
+    private boolean isSuperimposed(Particle p, Set<Particle> newP) {
+        for(Particle particle : newP) {
+            if(p.overlaps(particle)) {
                 return true;
             }
         }
@@ -126,26 +134,26 @@ public class Silo {
     }
 
     private Set<Particle> removeFallenParticles(double time) {
-        Set<Particle> newParticles = new HashSet<>();
+        Set<Particle> particles = new HashSet<>();
         for(Particle p : this.particles) {
-            if(p.getPosition().getY() > -L/10) {
-                newParticles.add(p);
+            if(p.getPosition().getY() > (-L/10)) {
+                particles.add(p);
             } else {
-                addParticle(p, newParticles);
+                addFallenParticles(p, particles);
                 timePrinter.appendToFile(time + "\n");
                 timePrinter.flush();
             }
         }
-        return newParticles;
+        return particles;
     }
 
     private void getEnergy(Printer energyPrinter) {
-        double speed2 = 0;
+        double speed = 0;
         for(Particle p : particles) {
-            speed2 += Math.pow(p.getSpeed().abs(), 2);
+            speed += Math.pow(p.getSpeed().abs(), 2);
         }
 
-        double energy = 0.5 * mass * speed2;
+        double energy = 0.5 * mass * speed;
 
         energyPrinter.appendToFile(energy + "\n");
         energyPrinter.flush();

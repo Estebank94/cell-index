@@ -7,7 +7,7 @@ public class Engine {
 
         String martina = "/Users/martinascomazzon/Documents/2019/ITBA/Simulacion de Sistemas/Granular Material_D_" + D;
         String esteban= "/Users/estebankramer1/Desktop/results" + D;
-        silo.start(martina,10);
+        silo.run(martina,10);
 
     }
 }
