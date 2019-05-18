@@ -1,9 +1,6 @@
 import java.util.*;
 import java.util.function.Function;
 
-/**
- * Created by estebankramer on 17/05/2019.
- */
 public class NeighbourCalculator {
     private double cellWidth;
     private Cell[][] grid;
@@ -30,12 +27,12 @@ public class NeighbourCalculator {
         }
     }
 
-    public Map<Particle, Set<Particle>> getNeighbours(Set<Particle> allParticles, Function<Particle, Vector2D> position) {
+    public Map<Particle, Set<Particle>> getNeighbours(Set<Particle> allParticles) {
         Map<Particle, Set<Particle>> neighbours = new HashMap<>();
 
         clearGrid();
 
-        addParticlesToGrid(allParticles, position);
+        addParticlesToGrid(allParticles);
 
         for(int i = 0; i < gridWidth; i++) {
             for(int j = 0; j < gridHeight; j++) {
@@ -52,10 +49,10 @@ public class NeighbourCalculator {
         return neighbours;
     }
 
-    private void addParticlesToGrid(Set<Particle> particles, Function<Particle, Vector2D> postiion) {
+    private void addParticlesToGrid(Set<Particle> particles) {
         for(Particle p : particles) {
-            int x = (int)(postiion.apply(p).getX() / cellWidth);
-            int y = (int)(postiion.apply(p).getY() / cellWidth);
+            int x = (int)(p.getPosition().getX() / cellWidth);
+            int y = (int)(p.getPosition().getY() / cellWidth);
 
             if(x>=0 && x< gridWidth && y >=0 && y< gridHeight){
                 grid[x][y].addParticle(p);

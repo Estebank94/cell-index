@@ -14,9 +14,9 @@ public class Beeman {
         initializeNeighbours(allparticles);
     }
 
-    private void initializeNeighbours(Set<Particle> allparticles) {
+    private void initializeNeighbours(Set<Particle> allParticles) {
         neighbours = new HashMap<>();
-        for(Particle p : allparticles){
+        for(Particle p : allParticles){
             neighbours.put(p, Collections.emptySet());
         }
 
@@ -79,9 +79,7 @@ public class Beeman {
 
     private void calculateNextAcceleration(Set<Particle> allParticles) {
 
-        //neighbours = Silo.bruteForce(allParticles, 0,Particle::getNextPosition);
-
-        neighbours = neighbourCalculator.getNeighbours(allParticles,Particle::getNextPosition);
+        neighbours = neighbourCalculator.getNeighbours(allParticles);
         for (Particle p : allParticles) {
             Vector2D acceleration = forceCalculator.calculate(p, neighbours.get(p))
                     .dividedBy(p.getMass());
