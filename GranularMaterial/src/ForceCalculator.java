@@ -34,24 +34,24 @@ public class ForceCalculator {
         double totalFn = 0;
 
         /* calculamos la fuerza contra todas las particulas que sean vecinas */
-        for(Particle other: neighbours) {
-            if(!p.equals(other)) {
-                overlap = overlapping(p, other);
-                d = overlappingDerivation(p, other);
+        for(Particle neighbour : neighbours) {
+            if(!p.equals(neighbour)) {
+                overlap = overlapping(p, neighbour);
+                d = overlappingDerivation(p, neighbour);
                 if(overlap > 0){
-                    double fn = calculateFn(overlap, d);
-                    double ft = calculateFt(fn, relativeVelocity(p, other));
+                    double nForce = nForce(overlap, d);
+                    double tForce = tForce(nForce, relativeVelocity(p, neighbour));
 
-                    totalFn += fn;
+                    totalFn += nForce;
 
-                    double enX = other.getPosition().getX() - p.getPosition().getX();
-                    double enY = other.getPosition().getY() - p.getPosition().getY();
+                    double enX = neighbour.getPosition().getX() - p.getPosition().getX();
+                    double enY = neighbour.getPosition().getY() - p.getPosition().getY();
                     double enT = Math.sqrt(Math.pow(enX,2) + Math.pow(enY,2));
 
                     Vector2D enV = new Vector2D(enX, enY);
                     Vector2D en = enV.dividedBy(enT);
 
-                    Vector2D newForce = new Vector2D(fn * en.x - ft * en.y,fn * en.y + ft * en.x);
+                    Vector2D newForce = new Vector2D(nForce * en.x - tForce * en.y,nForce * en.y + tForce * en.x);
 
                     force = force.add(newForce);
                 }
@@ -67,14 +67,13 @@ public class ForceCalculator {
     }
 
 
-    private double calculateFn(double overlap, double dOverlap) {
+    private double nForce(double overlap, double dOverlap) {
         return -Kn * overlap - Gama * dOverlap;
     }
 
-    private double calculateFt(double fn, double vRel) {
-        return - Mu * Math.abs(fn) * Math.signum(vRel);
+    private double tForce(double nForce, double vr) {
+        return - Mu * Math.abs(nForce) * Math.signum(vr);
     }
-
 
     private double overlapping(Particle i, Particle j){
 
@@ -118,7 +117,6 @@ public class ForceCalculator {
         return rv;
     }
 
-
     /**
      * Calculates forces implied by all the possible walls to the particle
      * @param p
@@ -137,6 +135,28 @@ public class ForceCalculator {
         return total;
     }
 
+    private Vector2D horizontalWall(Particle p){
+        double dervOver = 0, overlap = 0;
+        double enx = 0, eny = 0;
+        double fn, ft;
+
+        boolean shouldCrashBottom = (p.getPosition().getX() < (W/2 - D/2) || p.getPosition().getX() > W - (W/2 - D/2))
+                && p.getPosition().getY() > 0;
+
+        if(shouldCrashBottom && p.getPosition().getY() - p.getRadius() < 0) {
+            overlap = p.getRadius() - p.getPosition().getY();
+            dervOver = p.getSpeed().projectedOn(new Vector2D(0,-1));
+            enx = 0;
+            eny = -1;
+        }
+
+        fn = nForce(overlap, dervOver);
+        ft = tForce(fn, p.getSpeed().projectedOn(new Vector2D(1,0)));
+
+        Vector2D force = new Vector2D(fn * enx - ft * eny, fn * eny + ft * enx);
+        return force;
+    }
+
     private Vector2D leftWall(Particle p){
         double overlap = 0, dervOver = 0;
         double enx = 0, eny = 0;
@@ -148,8 +168,8 @@ public class ForceCalculator {
             eny = 0;
         }
 
-        fn = calculateFn(overlap,dervOver);
-        ft = calculateFt(fn, p.getSpeed().projectedOn(new Vector2D(0,1)));
+        fn = nForce(overlap,dervOver);
+        ft = tForce(fn, p.getSpeed().projectedOn(new Vector2D(0,1)));
         Vector2D force = new Vector2D(fn * enx - ft * eny, fn * eny + ft * enx);
         return force;
     }
@@ -168,34 +188,14 @@ public class ForceCalculator {
             eny = 0;
         }
 
-        fn = calculateFn(overlap,dervOver);
-        ft = calculateFt(fn, p.getSpeed().projectedOn(new Vector2D(0,1)));
+        fn = nForce(overlap,dervOver);
+        ft = tForce(fn, p.getSpeed().projectedOn(new Vector2D(0,1)));
 
         Vector2D force = new Vector2D(fn * enx - ft * eny, fn * eny + ft * enx);
         return force;
     }
 
-    private Vector2D horizontalWall(Particle p){
-        double dervOver = 0, overlap = 0;
-        double enx = 0, eny = 0;
-        double fn, ft;
 
-        boolean shouldCrashBottom = (p.getPosition().getX() < (W/2 - D/2) || p.getPosition().getX() > W - (W/2 - D/2))
-                && p.getPosition().getY() > 0;
-
-        if(shouldCrashBottom && p.getPosition().getY() - p.getRadius() < 0) {
-            overlap = p.getRadius() - p.getPosition().getY();
-            dervOver = p.getSpeed().projectedOn(new Vector2D(0,-1));
-            enx = 0;
-            eny = -1;
-        }
-
-        fn = calculateFn(overlap, dervOver);
-        ft = calculateFt(fn, p.getSpeed().projectedOn(new Vector2D(1,0)));
-
-        Vector2D force = new Vector2D(fn * enx - ft * eny, fn * eny + ft * enx);
-        return force;
-    }
 
 }
 
