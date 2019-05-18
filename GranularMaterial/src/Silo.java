@@ -7,7 +7,7 @@ public class Silo {
     private Set<Particle> particles;
 
     private double L, W, D;
-    private double time, dt;
+    private double t, dt;
     private final static int MAX_TRIES = 500;
 
     private static double minR = 0.01; // m
@@ -27,7 +27,7 @@ public class Silo {
         this.L = L;
         this.W = W;
         this.D = D;
-        this.time = 0;
+        this.t = 0;
         this.dt = 0.1 * Math.sqrt(mass/Math.pow(10, 5));
         this.printingStep = printingStep;
 
@@ -61,20 +61,20 @@ public class Silo {
         Printer energyPrinter = new Printer(outPath + "_energy", 0, 0, 0);
 
         int i = 0;
-        while(time < ft && i < 100000) {
+        while(t < ft && i < 100000) {
 
             this.particles = beeman.integrate(particles);
 
-            this.particles = removeFallenParticles(time);
+            this.particles = removeFallenParticles(t);
 
             if(i % printingStep == 0) {
                 printer.appendToFile(particles);
-                System.out.println("Time: " + time + "\t Iterations: " + i);
+                System.out.println("Time: " + t + "\t Iterations: " + i);
             }
 
             getEnergy(energyPrinter);
 
-            time += dt;
+            t += dt;
             i++;
         }
 
@@ -133,14 +133,14 @@ public class Silo {
         return false;
     }
 
-    private Set<Particle> removeFallenParticles(double time) {
+    private Set<Particle> removeFallenParticles(double t) {
         Set<Particle> particles = new HashSet<>();
         for(Particle p : this.particles) {
             if(p.getPosition().getY() > (-L/10)) {
                 particles.add(p);
             } else {
                 addFallenParticles(p, particles);
-                timePrinter.appendToFile(time + "\n");
+                timePrinter.appendToFile(t + "\n");
                 timePrinter.flush();
             }
         }
