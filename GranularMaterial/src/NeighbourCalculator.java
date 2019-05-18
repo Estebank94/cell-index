@@ -16,16 +16,15 @@ public class NeighbourCalculator {
         this.outOfBounds = new HashSet<>();
 
         grid = new Cell[gridWidth][gridHeight];
-        initializeGrid();
-    }
 
-    private void initializeGrid() {
         for(int i = 0; i < gridWidth; i++) {
             for(int j = 0; j <  gridHeight; j++) {
                 grid[i][j] = new Cell(i, j);
             }
         }
+
     }
+
 
     public Map<Particle, Set<Particle>> getNeighbours(Set<Particle> allParticles) {
         Map<Particle, Set<Particle>> neighbours = new HashMap<>();
@@ -69,18 +68,16 @@ public class NeighbourCalculator {
         int y = field.getY();
 
         addParticles(nearParticles,x-1,y-1);
-        addParticles(nearParticles,x+0,y-1);
+        addParticles(nearParticles,x,y-1);
         addParticles(nearParticles,x+1,y-1);
 
-        addParticles(nearParticles,x-1,y+0);
-        addParticles(nearParticles,x+0,y+0);
-        addParticles(nearParticles,x+1,y+0);
+        addParticles(nearParticles,x-1,y);
+        addParticles(nearParticles,x,y);
+        addParticles(nearParticles,x+1,y);
 
         addParticles(nearParticles,x-1,y+1);
-        addParticles(nearParticles,x+0,y+1);
+        addParticles(nearParticles,x,y+1);
         addParticles(nearParticles,x+1,y+1);
-
-
 
         return nearParticles;
     }

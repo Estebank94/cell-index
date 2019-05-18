@@ -7,49 +7,48 @@ public class Beeman {
     private NeighbourCalculator neighbourCalculator;
     private Map<Particle, Set<Particle>> neighbours;
 
-    public Beeman(ForceCalculator forceCalculator, NeighbourCalculator neighbourCalculator, double dt, Set<Particle> allparticles) {
+    public Beeman(ForceCalculator forceCalculator, NeighbourCalculator neighbourCalculator, double dt, Set<Particle> particles) {
         this.forceCalculator = forceCalculator;
         this.dt = dt;
-        this.neighbourCalculator =neighbourCalculator;
-        initializeNeighbours(allparticles);
-    }
+        this.neighbourCalculator = neighbourCalculator;
 
-    private void initializeNeighbours(Set<Particle> allParticles) {
+        /* Initialize neighbours */
         neighbours = new HashMap<>();
-        for(Particle p : allParticles){
+        for(Particle p : particles){
             neighbours.put(p, Collections.emptySet());
         }
-
     }
 
+    /**
+     * Uses Beeman formulas seen in class
+     * @param particles
+     * @return a set of the particles with its information: speed, location & acceleration updated
+     */
+    public Set<Particle> integrate(Set<Particle> particles) {
 
-    public Set<Particle> integrate(Set<Particle> allParticles) {
+        calculateAcceleration(particles);
 
-        calculateAcceleration(allParticles);
+        calculateNextPosition(particles);
 
-        calculateNextPosition(allParticles);
+        calculateNextSpeedPredicted(particles);
 
-        calculateNextSpeedPredicted(allParticles);
+        calculateNextAcceleration(particles);
 
-        calculateNextAcceleration(allParticles);
+        calculateNextSpeedCorrected(particles);
 
-        calculateNextSpeedCorrected(allParticles);
-
-        return getUpdatedParticles(allParticles);
+        return getUpdatedParticles(particles);
     }
 
-    private void calculateAcceleration(Set<Particle> allParticles) {
-        // Map<Particle, Set<Particle>> neighbours = Silo.bruteForce(allParticles, 0, Particle::getPosition);
-        //Map<Particle, Set<Particle>> neighbours = neighbourCalculator.getNeighbours(allParticles,Particle::getPosition);
-        for (Particle p : allParticles) {
+    private void calculateAcceleration(Set<Particle> particles) {
+        for (Particle p : particles) {
             Vector2D acceleration = forceCalculator.calculate(p, neighbours.get(p))
                     .dividedBy(p.getMass());
             p.setAcceleration(acceleration);
         }
     }
 
-    private void calculateNextPosition(Set<Particle> allParticles) {
-        for (Particle p : allParticles) {
+    private void calculateNextPosition(Set<Particle> particles) {
+        for (Particle p : particles) {
             Vector2D pos = p.getPosition();
             Vector2D sp = p.getSpeed();
             Vector2D ac = p.getAcceleration();
@@ -62,8 +61,8 @@ public class Beeman {
         }
     }
 
-    private void calculateNextSpeedPredicted(Set<Particle> allParticles) {
-        for (Particle p : allParticles) {
+    private void calculateNextSpeedPredicted(Set<Particle> particles) {
+        for (Particle p : particles) {
             Vector2D sp = p.getSpeed();
             Vector2D ac = p.getAcceleration();
             Vector2D prAc = p.getPreviousAcceleration();
@@ -77,21 +76,18 @@ public class Beeman {
 
     }
 
-    private void calculateNextAcceleration(Set<Particle> allParticles) {
+    private void calculateNextAcceleration(Set<Particle> particles) {
 
-        neighbours = neighbourCalculator.getNeighbours(allParticles);
-        for (Particle p : allParticles) {
+        neighbours = neighbourCalculator.getNeighbours(particles);
+        for (Particle p : particles) {
             Vector2D acceleration = forceCalculator.calculate(p, neighbours.get(p))
                     .dividedBy(p.getMass());
             p.setNextAcceleration(acceleration);
         }
-
-
     }
 
-
-    private void calculateNextSpeedCorrected(Set<Particle> allParticles) {
-        for (Particle p : allParticles) {
+    private void calculateNextSpeedCorrected(Set<Particle> particles) {
+        for (Particle p : particles) {
             Vector2D sp = p.getSpeed();
             Vector2D ac = p.getAcceleration();
             Vector2D prAc = p.getPreviousAcceleration();
@@ -100,18 +96,16 @@ public class Beeman {
             double nextVx = sp.getX() + 1.0 / 3.0 * neAc.getX() * dt + 5.0 / 6.0 * ac.getX() * dt - 1.0 / 6.0 * prAc.getX() * dt;
             double nextVy = sp.getY() + 1.0 / 3.0 * neAc.getY() * dt + 5.0 / 6.0 * ac.getY() * dt - 1.0 / 6.0 * prAc.getY() * dt;
 
-
             p.setNextSpeedCorrected(new Vector2D(nextVx, nextVy));
         }
 
     }
 
-
-    private Set<Particle> getUpdatedParticles(Set<Particle> allParticles) {
+    private Set<Particle> getUpdatedParticles(Set<Particle> particles) {
         Set<Particle> updatedParticles = new HashSet<>();
 
-        for (Particle p : allParticles) {
-            Particle newP =Particle.of(p, p.getNextPosition(), p.getNextSpeedCorrected(), p.getAcceleration());
+        for (Particle p : particles) {
+            Particle newP = new Particle (p, p.getNextPosition(), p.getNextSpeedCorrected(), p.getAcceleration());
             newP.setTotalFn(p.getTotalFn());
             updatedParticles.add(newP);
 

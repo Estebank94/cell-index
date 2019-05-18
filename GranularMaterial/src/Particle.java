@@ -22,7 +22,7 @@ public class Particle {
 
 
 
-    private Particle(Particle p, Vector2D position, Vector2D speed, Vector2D previousAcc){
+    public Particle(Particle p, Vector2D position, Vector2D speed, Vector2D previousAcc){
         this.id=p.id;
         this.mass=p.mass;
         this.radius=p.radius;
@@ -52,12 +52,6 @@ public class Particle {
         this.acceleration = new Vector2D();
         this.nextAcceleration = new Vector2D();
 
-    }
-
-
-
-    public static Particle of(Particle p, Vector2D position, Vector2D speed, Vector2D previousAcc){
-        return new Particle(p,position,speed,previousAcc);
     }
 
     public int getId() {

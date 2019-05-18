@@ -5,9 +5,6 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Created by estebankramer on 17/05/2019.
- */
 public class Printer {
 
     BufferedWriter bw;
