@@ -37,10 +37,6 @@ public class Vector2D {
         return new Vector2D(x - vector.x, y - vector.y);
     }
 
-    public Vector2D multiplyBy(final double value) {
-        return new Vector2D(x*value, y*value);
-    }
-
     public Vector2D dividedBy(final double value) {
         return new Vector2D(x/value, y/value);
     }
@@ -71,10 +67,6 @@ public class Vector2D {
 
     public boolean isInitialized() {
         return initialized;
-    }
-
-    public void setInitialized(boolean initialized) {
-        this.initialized = initialized;
     }
 
     @Override
