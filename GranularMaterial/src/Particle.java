@@ -1,56 +1,56 @@
 public class Particle {
+
     private final int id;
     private final double radius;
     private final double mass;
 
-    private final Vector2D previousAcceleration;
-
     private final Vector2D position;
-    private final Vector2D speed;
-
-    private Vector2D acceleration;
-
     private Vector2D nextPosition;
-    private Vector2D nextSpeedPredicted;
 
+    private final Vector2D previousAcceleration;
+    private Vector2D acceleration;
     private Vector2D nextAcceleration;
 
+    private final Vector2D speed;
+    private Vector2D nextSpeedPredicted;
     private Vector2D nextSpeedCorrected;
 
     private double totalFn;
 
-
-
-
     public Particle(Particle p, Vector2D position, Vector2D speed, Vector2D previousAcc){
-        this.id=p.id;
-        this.mass=p.mass;
-        this.radius=p.radius;
+        this.id = p.id;
+        this.mass = p.mass;
+        this.radius = p.radius;
 
-        this.previousAcceleration=previousAcc;
-        this.speed=speed;
-        this.position=position;
-
-        this.nextPosition = new Vector2D();
-        this.nextSpeedPredicted = new Vector2D();
-        this.nextSpeedCorrected = new Vector2D();
+        this.previousAcceleration = previousAcc;
         this.acceleration = new Vector2D();
         this.nextAcceleration = new Vector2D();
+
+        this.position = position;
+        this.nextPosition = new Vector2D();
+
+        this.speed = speed;
+        this.nextSpeedPredicted = new Vector2D();
+        this.nextSpeedCorrected = new Vector2D();
+
         this.totalFn = 0;
     }
+
     public Particle(int id, double xPosition, double yPosition, double xSpeed, double ySpeed, double radius, double mass) {
         this.id = id;
         this.radius = radius;
         this.mass = mass;
 
         this.previousAcceleration = new Vector2D(0,0);
-        this.position = new Vector2D(xPosition,yPosition);
-        this.speed =  new Vector2D (xSpeed,ySpeed);
-        this.nextPosition = new Vector2D();
-        this.nextSpeedPredicted = new Vector2D();
-        this.nextSpeedCorrected = new Vector2D();
         this.acceleration = new Vector2D();
         this.nextAcceleration = new Vector2D();
+
+        this.position = new Vector2D(xPosition,yPosition);
+        this.nextPosition = new Vector2D();
+
+        this.nextSpeedPredicted = new Vector2D();
+        this.nextSpeedCorrected = new Vector2D();
+        this.speed = new Vector2D (xSpeed,ySpeed);
 
     }
 
@@ -112,8 +112,6 @@ public class Particle {
         }
         return nextSpeedCorrected;
     }
-
-
 
     public void setNextPosition(Vector2D nextPosition){
         if(this.nextPosition.isInitialized()){

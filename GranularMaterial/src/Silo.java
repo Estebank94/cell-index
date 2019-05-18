@@ -22,6 +22,7 @@ public class Silo {
     // gama = 100 kg/s
 
     public Silo(double L, double W, double D, double printingStep) {
+
         particles = new HashSet<>();
 
         this.L = L;
@@ -31,7 +32,7 @@ public class Silo {
         this.dt = 0.1 * Math.sqrt(mass/Math.pow(10, 5));
         this.printingStep = printingStep;
 
-        System.out.println("Dt is :" + dt);
+        System.out.println("Dt is: " + dt);
 
         System.out.println("Adding particles...");
         int i = 0;
@@ -54,7 +55,7 @@ public class Silo {
         double interactionR = 0;
 
         Beeman beeman = new Beeman(new ForceCalculator(L, W, D)
-            ,new NeighbourCalculator(L,W,interactionR, maxR), dt,particles);
+            ,new NeighbourCalculator(L,W,interactionR, maxR), dt, particles);
 
         Printer printer = new Printer(outPath, L, W, D);
         timePrinter = new Printer(outPath + "_time", 0, 0, 0);
