@@ -42,7 +42,7 @@ public class Beeman {
         // Map<Particle, Set<Particle>> neighbours = Silo.bruteForce(allParticles, 0, Particle::getPosition);
         //Map<Particle, Set<Particle>> neighbours = neighbourCalculator.getNeighbours(allParticles,Particle::getPosition);
         for (Particle p : allParticles) {
-            Vector2D acceleration = forceCalculator.calculate(p, neighbours.get(p), Particle::getPosition, Particle::getSpeed)
+            Vector2D acceleration = forceCalculator.calculate(p, neighbours.get(p))
                     .dividedBy(p.getMass());
             p.setAcceleration(acceleration);
         }
@@ -58,7 +58,7 @@ public class Beeman {
             double nextPx = pos.getX() + sp.getX() * dt + 2.0 / 3.0 * ac.getX() * dt * dt - 1.0 / 6.0 * prAc.getX() * dt * dt;
             double nextPy = pos.getY() + sp.getY() * dt + 2.0 / 3.0 * ac.getY() * dt * dt - 1.0 / 6.0 * prAc.getY() * dt * dt;
 
-            p.setNextPosition(Vector2D.of(nextPx, nextPy));
+            p.setNextPosition(new Vector2D(nextPx, nextPy));
         }
     }
 
@@ -72,7 +72,7 @@ public class Beeman {
             double nextVy = sp.getY() + 3.0 / 2.0 * ac.getY() * dt - 1.0 / 2.0 * prAc.getY() * dt;
 
 
-            p.setNextSpeedPredicted(Vector2D.of(nextVx, nextVy));
+            p.setNextSpeedPredicted(new Vector2D(nextVx, nextVy));
         }
 
     }
@@ -83,7 +83,7 @@ public class Beeman {
 
         neighbours = neighbourCalculator.getNeighbours(allParticles,Particle::getNextPosition);
         for (Particle p : allParticles) {
-            Vector2D acceleration = forceCalculator.calculate(p, neighbours.get(p), Particle::getNextPosition,Particle:: getNextSpeedPredicted)
+            Vector2D acceleration = forceCalculator.calculate(p, neighbours.get(p))
                     .dividedBy(p.getMass());
             p.setNextAcceleration(acceleration);
         }
@@ -103,7 +103,7 @@ public class Beeman {
             double nextVy = sp.getY() + 1.0 / 3.0 * neAc.getY() * dt + 5.0 / 6.0 * ac.getY() * dt - 1.0 / 6.0 * prAc.getY() * dt;
 
 
-            p.setNextSpeedCorrected(Vector2D.of(nextVx, nextVy));
+            p.setNextSpeedCorrected(new Vector2D(nextVx, nextVy));
         }
 
     }

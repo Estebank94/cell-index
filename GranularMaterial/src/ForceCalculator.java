@@ -19,26 +19,30 @@ public class ForceCalculator {
     }
 
 
-    public Vector2D calculate(Particle p, Set<Particle> neighbours, Function<Particle, Vector2D> position, Function<Particle, Vector2D> speed) {
-        Vector2D force = Vector2D.of(0,- p.getMass() * g);
+    public Vector2D calculate(Particle p, Set<Particle> neighbours) {
+
+        Vector2D force = new Vector2D(0,- p.getMass() * g);
         double overlapping, derivate;
 
         double totalFn = 0;
 
         for(Particle other: neighbours) {
             if(!p.equals(other)) {
-                overlapping= overlaping(p, other, position);
-                derivate = derivateOverlap(p, other, position, speed);
+                overlapping = overlaping(p, other);
+                derivate = derivateOverlap(p, other);
                 if(overlapping>0){
                     double fn = calculateFn(overlapping, derivate);
-                    double ft = calculateFt(fn, calculateRelativeVelocity(p, other, speed, position));
+                    double ft = calculateFt(fn, calculateRelativeVelocity(p, other));
 
                     totalFn += fn;
 
-                    Vector2D en = position.apply(other).subtract(position.apply(p))
-                            .dividedBy(position.apply(other).subtract(position.apply(p)).abs());
+                    double enX = other.getPosition().getX() - p.getPosition().getX();
+                    double enY = other.getPosition().getY() - p.getPosition().getY();
+                    double enT = Math.sqrt(Math.pow(enX,2) + Math.pow(enY,2));
+                    Vector2D enV = new Vector2D(enX, enY);
+                    Vector2D en = enV.dividedBy(enT);
 
-                    force = force.add(Vector2D.of(fn * en.x - ft * en.y,fn * en.y + ft * en.x));
+                    force = force.add(new Vector2D(fn * en.x - ft * en.y,fn * en.y + ft * en.x));
                 }
 
             }
@@ -47,7 +51,7 @@ public class ForceCalculator {
         }
         p.setTotalFn(totalFn);
 
-        force = force.add(getWallForces(p,position,speed));
+        force = force.add(getWallForces(p));
 
         return force;
     }
@@ -64,86 +68,105 @@ public class ForceCalculator {
     }
 
 
-    private double overlaping(Particle i, Particle j, Function<Particle, Vector2D> position){
-        double result = i.getRadius() + j.getRadius() - position.apply(i).subtract(position.apply(j)).abs();
+    private double overlaping(Particle i, Particle j){
 
+        double resultX = Math.abs(i.getPosition().getX() - j.getPosition().getX());
+        double resultY = Math.abs(i.getPosition().getY() - j.getPosition().getY());
+
+        double result = i.getRadius() + j.getRadius() - Math.sqrt(Math.pow(resultX, 2) + Math.pow(resultY,2));
 
         return result > 0 ? result  : 0;
     }
 
-    private double derivateOverlap(Particle i, Particle j, Function<Particle, Vector2D> position , Function<Particle, Vector2D> speed){
-        Vector2D direction = position.apply(j).subtract(position.apply(i));
-        double result = speed.apply(i).projectedOn(direction) - speed.apply(j).projectedOn(direction);
+    private double derivateOverlap(Particle i, Particle j){
+        double directionX = j.getPosition().getX() - i.getPosition().getX();
+        double directionY = j.getPosition().getY() - i.getPosition().getY();
+        Vector2D direction = new Vector2D(directionX, directionY);
 
-        if(overlaping(i, j, position) > 0) {
+        double result = i.getSpeed().projectedOn(direction) - j.getSpeed().projectedOn(direction);
+
+        if(overlaping(i, j) > 0) {
             return result;
         }
         return 0;
     }
 
 
-    private double calculateRelativeVelocity(Particle i, Particle j, Function<Particle, Vector2D> speed, Function<Particle, Vector2D> position) {
-        Vector2D direction = position.apply(j).subtract(position.apply(i)).tangent();
-        return speed.apply(i).subtract(speed.apply(j)).projectedOn(direction);
+    private double calculateRelativeVelocity(Particle i, Particle j) {
+        double directionX = j.getPosition().getX() - i.getPosition().getX();
+        double directionY = j.getPosition().getY() - i.getPosition().getY();
+        Vector2D direction = new Vector2D(directionX, directionY).tangent();
+
+        double speedX = i.getSpeed().getX() - j.getSpeed().getX();
+        double speedY = i.getSpeed().getY() - j.getSpeed().getY();
+        Vector2D speedV = new Vector2D(speedX, speedY);
+
+        return speedV.projectedOn(direction);
     }
 
 
 
 
-    private Vector2D getWallForces(Particle p, Function<Particle, Vector2D> position, Function<Particle, Vector2D> speed) {
+    private Vector2D getWallForces(Particle p) {
 
-        Vector2D right = rightWall(p, position, speed);
+        Vector2D right = rightWall(p);
 
-        Vector2D left = leftWall(p, position, speed);
+        Vector2D left = leftWall(p);
 
-        Vector2D horizontal = horizontalWall(p, position, speed);
+        Vector2D horizontal = horizontalWall(p);
 
         return right.add(left).add(horizontal);
     }
 
-    private Vector2D leftWall(Particle p, Function<Particle, Vector2D> position, Function<Particle, Vector2D> speed){
+    private Vector2D leftWall(Particle p){
         double overlaping = 0, dervOver = 0, enx = 0, eny = 0, fn, ft;
-        if(position.apply(p).x - p.getRadius() < 0){
-            overlaping = p.getRadius() - position.apply(p).x;
-            dervOver = speed.apply(p).projectedOn(Vector2D.of(-1, 0));
+        if(p.getPosition().getX() - p.getRadius() < 0){
+            overlaping = p.getRadius() - p.getPosition().getX();
+            dervOver = p.getSpeed().projectedOn(new Vector2D(-1, 0));
             enx = -1;
             eny = 0;
         }
 
         fn = calculateFn(overlaping,dervOver);
-        ft = calculateFt(fn, speed.apply(p).projectedOn(Vector2D.of(0,1)));
-        return Vector2D.of(fn * enx - ft * eny, fn * eny + ft * enx);
+        ft = calculateFt(fn, p.getSpeed().projectedOn(new Vector2D(0,1)));
+        return new Vector2D(fn * enx - ft * eny, fn * eny + ft * enx);
     }
 
-    private Vector2D rightWall(Particle p, Function<Particle, Vector2D> position, Function<Particle, Vector2D> speed) {
-        double dervOver = 0, overlaping = 0, enx = 0, eny = 0, fn, ft;
-        if(position.apply(p).x + p.getRadius() > W){
-            overlaping = position.apply(p).x + p.getRadius() - W;
-            dervOver = speed.apply(p).projectedOn(Vector2D.of(1, 0));
+    private Vector2D rightWall(Particle p) {
+        double dervOver = 0;
+        double overlaping = 0;
+        double enx = 0, eny = 0;
+        double fn, ft;
+
+
+        if(p.getPosition().getX() + p.getRadius() > W){
+            overlaping = p.getPosition().getX() + p.getRadius() - W;
+            dervOver = p.getSpeed().projectedOn(new Vector2D(1, 0));
             enx = 1;
             eny = 0;
         }
 
         fn = calculateFn(overlaping,dervOver);
-        ft = calculateFt(fn, speed.apply(p).projectedOn(Vector2D.of(0,1)));
-        return Vector2D.of(fn * enx - ft * eny, fn * eny + ft * enx);
+        ft = calculateFt(fn, p.getSpeed().projectedOn(new Vector2D(0,1)));
+        return new Vector2D(fn * enx - ft * eny, fn * eny + ft * enx);
     }
 
-    private Vector2D horizontalWall(Particle p, Function<Particle, Vector2D> position, Function<Particle, Vector2D> speed){
+    private Vector2D horizontalWall(Particle p){
         double dervOver = 0, overlaping = 0, enx = 0, eny = 0, fn, ft;
 
-        boolean shouldCrashBottom = (position.apply(p).x < (W/2 - D/2) || position.apply(p).x > W - (W/2 - D/2)) && position.apply(p).y > 0;
+        boolean shouldCrashBottom = (p.getPosition().getX() < (W/2 - D/2) || p.getPosition().getX() > W - (W/2 - D/2))
+                && p.getPosition().getY() > 0;
 
-        if(shouldCrashBottom && position.apply(p).y - p.getRadius() < 0) {
-            overlaping = p.getRadius() - position.apply(p).y;
-            dervOver = speed.apply(p).projectedOn(Vector2D.of(0,-1));
+        if(shouldCrashBottom && p.getPosition().getY() - p.getRadius() < 0) {
+            overlaping = p.getRadius() - p.getPosition().getY();
+            dervOver = p.getSpeed().projectedOn(new Vector2D(0,-1));
             enx = 0;
             eny = -1;
         }
 
         fn = calculateFn(overlaping, dervOver);
-        ft = calculateFt(fn, speed.apply(p).projectedOn(Vector2D.of(1,0)));
-        return  Vector2D.of( fn * enx - ft * eny, fn * eny + ft * enx);
+        ft = calculateFt(fn, p.getSpeed().projectedOn(new Vector2D(1,0)));
+        return  new Vector2D( fn * enx - ft * eny, fn * eny + ft * enx);
     }
 
 }

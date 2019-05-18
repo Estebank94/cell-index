@@ -1,17 +1,13 @@
-/**
- * Created by estebankramer on 17/05/2019.
- */
+
 public class Vector2D {
 
-    public static final Vector2D ZERO = Vector2D.of(0.0, 0.0);
+    public static final Vector2D ZERO = new Vector2D(0.0, 0.0);
 
     final double x;
     final double y;
     boolean initialized;
 
-    public static Vector2D of(final double x, final double y) {
-        return new Vector2D(x, y);
-    }
+
 
     public Vector2D(final double x, final double y) {
         this.x = x;
@@ -34,23 +30,23 @@ public class Vector2D {
     }
 
     public Vector2D add(final Vector2D vector) {
-        return Vector2D.of(x + vector.x, y + vector.y);
+        return new Vector2D(x + vector.x, y + vector.y);
     }
 
     public Vector2D subtract(final Vector2D vector) {
-        return Vector2D.of(x - vector.x, y - vector.y);
+        return new Vector2D(x - vector.x, y - vector.y);
     }
 
     public Vector2D multiplyBy(final double value) {
-        return Vector2D.of(x*value, y*value);
+        return new Vector2D(x*value, y*value);
     }
 
     public Vector2D dividedBy(final double value) {
-        return Vector2D.of(x/value, y/value);
+        return new Vector2D(x/value, y/value);
     }
 
     public Vector2D versor() {
-        return Vector2D.of(x, y).dividedBy(abs());
+        return new Vector2D(x, y).dividedBy(abs());
     }
 
     public double abs() {
@@ -62,11 +58,11 @@ public class Vector2D {
     }
 
     public double projectedOn(Vector2D other) {
-        return Vector2D.of(x, y).dot(other.versor());
+        return new Vector2D(x, y).dot(other.versor());
     }
 
     public Vector2D tangent() {
-        return Vector2D.of(-y, x);
+        return new Vector2D(-y, x);
     }
 
     public double distance(Vector2D other){

@@ -33,14 +33,14 @@ public class Silo {
         while(i < 1000 && tries < MAX_TRIES) {
             if(addPartilce()) {
                 i++;
-                System.out.println(i);
+//                System.out.println(i);
                 tries = 0;
             } else {
                 tries++;
             }
         }
 
-        System.out.println(particles.size() + " particles added.");
+//        System.out.println(particles.size() + " particles added.");
     }
 
     public void start(String outPath,double finalTime){

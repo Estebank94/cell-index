@@ -43,9 +43,9 @@ public class Particle {
         this.radius = radius;
         this.mass = mass;
 
-        this.previousAcceleration = Vector2D.of(0,0);
-        this.position = Vector2D.of(xPosition,yPosition);
-        this.speed =  Vector2D.of(xSpeed,ySpeed);
+        this.previousAcceleration = new Vector2D(0,0);
+        this.position = new Vector2D(xPosition,yPosition);
+        this.speed =  new Vector2D (xSpeed,ySpeed);
         this.nextPosition = new Vector2D();
         this.nextSpeedPredicted = new Vector2D();
         this.nextSpeedCorrected = new Vector2D();
