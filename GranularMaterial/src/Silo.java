@@ -4,19 +4,22 @@ import java.util.Set;
 
 public class Silo {
     private Set<Particle> particles;
-    private double L, W, D,time,dt;
+    private double L, W, D;
+    private double time, dt;
     private final static int MAX_TRIES = 500;
 
-    private static double minRadius = 0.01; // m
-    private static double maxRadius = 0.015; // m
+    private static double minR = 0.01; // m
+    private static double maxR = 0.015; // m
     private static double mass = 0.01; // kg
+
+    private double printingStep;
 
     private Printer timePrinter;
 
     // mu = 0.7
     // gama = 100 kg/s
 
-    public Silo(double L, double W, double D) {
+    public Silo(double L, double W, double D, double printingStep) {
         particles = new HashSet<>();
 
         this.L = L;
@@ -24,8 +27,9 @@ public class Silo {
         this.D = D;
         this.time = 0;
         this.dt = 0.1 * Math.sqrt(mass/Math.pow(10, 5));
+        this.printingStep = printingStep;
 
-        System.out.println("Dt is :"+dt);
+        System.out.println("Dt is :" + dt);
 
         System.out.println("Adding particles...");
         int i = 0;
@@ -33,23 +37,24 @@ public class Silo {
         while(i < 1000 && tries < MAX_TRIES) {
             if(addPartilce()) {
                 i++;
-//                System.out.println(i);
+                System.out.println(i);
                 tries = 0;
             } else {
                 tries++;
             }
         }
 
-//        System.out.println(particles.size() + " particles added.");
+        System.out.println(particles.size() + " particles added.");
     }
 
     public void start(String outPath,double finalTime){
+
+        Beeman integrator = new Beeman(new ForceCalculator(L, W, D)
+            , new NeighbourCalculator(L,W,0, maxR), dt,particles);
+
         Printer printer = new Printer(outPath, L, W, D);
         timePrinter = new Printer(outPath+"_time", 0, 0, 0);
         Printer energyPrinter = new Printer(outPath+"_energy", 0, 0, 0);
-
-        Beeman integrator = new Beeman(new ForceCalculator(L, W, D)
-                , new NeighbourCalculator(L,W,0,maxRadius), dt,particles);
 
         int iterations = 0;
         while(time < finalTime && iterations < 100000) {
@@ -58,12 +63,10 @@ public class Silo {
 
             this.particles = removeFallenParticles(time);
 
-
-            if(iterations % 100 == 0) {
+            if(iterations % printingStep == 0) {
                 printer.appendToFile(particles);
                 System.out.println("Time: " + time + "\t iterations: " + iterations);
             }
-
 
             getEnergy(energyPrinter);
 
@@ -76,7 +79,7 @@ public class Silo {
     private boolean addPartilce() {
         Random rand = new Random();
 
-        double radius = rand.nextDouble() * (maxRadius - minRadius) + minRadius;
+        double radius = rand.nextDouble() * (maxR - minR) + minR;
         double x = rand.nextDouble() * (W - 2 * radius) + radius;
         double y = rand.nextDouble() * (L - 2 * radius) + radius;
 
@@ -134,13 +137,6 @@ public class Silo {
             }
         }
         return newParticles;
-    }
-
-
-    private void clearFnofParticle() {
-        for (Particle p : particles) {
-            p.clearFn();
-        }
     }
 
     private void getEnergy(Printer energyPrinter) {
