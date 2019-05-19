@@ -40,7 +40,7 @@ public class ForceCalculator {
                 d = overlappingDerivation(p, neighbour);
                 if(overlap > 0){
                     double nForce = nForce(overlap, d);
-                    double tForce = tForce(nForce, relativeVelocity(p, neighbour));
+//                    double tForce = tForce(nForce, relativeVelocity(p, neighbour));
 
                     totalFn += nForce;
 
@@ -51,7 +51,7 @@ public class ForceCalculator {
                     Vector2D enV = new Vector2D(enX, enY);
                     Vector2D en = enV.dividedBy(enT);
 
-                    Vector2D newForce = new Vector2D(nForce * en.x - tForce * en.y,nForce * en.y + tForce * en.x);
+                    Vector2D newForce = new Vector2D(nForce * en.x /*- tForce * en.y*/,nForce * en.y /*+ tForce * en.x*/);
 
                     force = force.add(newForce);
                 }
@@ -151,9 +151,9 @@ public class ForceCalculator {
         }
 
         fn = nForce(overlap, dervOver);
-        ft = tForce(fn, p.getSpeed().projectedOn(new Vector2D(1,0)));
+//        ft = tForce(fn, p.getSpeed().projectedOn(new Vector2D(1,0)));
 
-        Vector2D force = new Vector2D(fn * enx - ft * eny, fn * eny + ft * enx);
+        Vector2D force = new Vector2D(fn * enx /*- ft * eny*/, fn * eny /*+ ft * enx*/);
         return force;
     }
 
@@ -169,8 +169,8 @@ public class ForceCalculator {
         }
 
         fn = nForce(overlap,dervOver);
-        ft = tForce(fn, p.getSpeed().projectedOn(new Vector2D(0,1)));
-        Vector2D force = new Vector2D(fn * enx - ft * eny, fn * eny + ft * enx);
+//        ft = tForce(fn, p.getSpeed().projectedOn(new Vector2D(0,1)));
+        Vector2D force = new Vector2D(fn * enx /*- ft * eny*/, fn * eny /*+ ft * enx*/);
         return force;
     }
 
@@ -189,9 +189,9 @@ public class ForceCalculator {
         }
 
         fn = nForce(overlap,dervOver);
-        ft = tForce(fn, p.getSpeed().projectedOn(new Vector2D(0,1)));
+//        ft = tForce(fn, p.getSpeed().projectedOn(new Vector2D(0,1)));
 
-        Vector2D force = new Vector2D(fn * enx - ft * eny, fn * eny + ft * enx);
+        Vector2D force = new Vector2D(fn * enx /*- ft * eny*/, fn * eny /*+ ft * enx*/);
         return force;
     }
 

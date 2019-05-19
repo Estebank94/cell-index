@@ -37,7 +37,7 @@ public class Silo {
         System.out.println("Adding particles...");
         int i = 0;
         int tries = 0;
-        while(i < 1000 && tries < MAX_TRIES) {
+        while(/*i < 1000 &&*/ tries < MAX_TRIES) {
             if(addParticle()) {
                 i++;
                 System.out.println(i);
@@ -62,7 +62,7 @@ public class Silo {
         Printer energyPrinter = new Printer(outPath + "_energy", 0, 0, 0);
 
         int i = 0;
-        while(t < ft && i < 100000) {
+        while(t < ft /*&& i < 100000*/) {
 
             this.particles = beeman.integrate(particles);
 
@@ -78,7 +78,7 @@ public class Silo {
             t += dt;
             i++;
         }
-
+        System.out.println(i);
     }
 
     private boolean addParticle() {
