@@ -7,7 +7,7 @@ public class ForceCalculator {
     private static double Kn = Math.pow(10, 5); // N/m
     private static double Kt = 2 * Kn; // N/m
     private static double Mu = 0.1;
-    private static double Gama = 100; // Kg/s
+    private static double Gama = 70; // Kg/s
 
     private double L, W, D;
 
@@ -55,12 +55,10 @@ public class ForceCalculator {
 
                     force = force.add(newForce);
                 }
-
             }
-
         }
-        p.setTotalFn(totalFn);
 
+        p.setTotalFn(totalFn);
         force = force.add(getWallForces(p));
 
         return force;
@@ -194,8 +192,6 @@ public class ForceCalculator {
         Vector2D force = new Vector2D(fn * enx /*- ft * eny*/, fn * eny /*+ ft * enx*/);
         return force;
     }
-
-
 
 }
 
