@@ -168,7 +168,7 @@ public class Particle {
     }
 
     public void setTotalFn(double totalFn) {
-        if (this.totalFn == 0) {
+        if(totalFn != 0) {
             this.totalFn = totalFn;
         }
     }

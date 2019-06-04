@@ -8,7 +8,7 @@ public class Silo {
 
     private double L, W, D;
     private double t, dt;
-    private final static int MAX_TRIES = 500;
+    private final static int MAX_TRIES = 5000;
 
     private static double minR = 0.01; // m
     private static double maxR = 0.015; // m
@@ -29,7 +29,8 @@ public class Silo {
         this.W = W;
         this.D = D;
         this.t = 0;
-        this.dt = 0.1 * Math.sqrt(mass/Math.pow(10, 5));
+        this.dt = Math.pow(10,-5);
+//        this.dt = 0.1 * Math.sqrt(mass/Math.pow(10, 5));
         this.printingStep = printingStep;
 
         System.out.println("Dt is: " + dt);
@@ -37,7 +38,7 @@ public class Silo {
         System.out.println("Adding particles...");
         int i = 0;
         int tries = 0;
-        while(i < 1000 && tries < MAX_TRIES) {
+        while(i < 500 || tries < MAX_TRIES) {
             if(addParticle()) {
                 i++;
                 System.out.println(i);
@@ -62,7 +63,7 @@ public class Silo {
         Printer energyPrinter = new Printer(outPath + "_energy", 0, 0, 0);
 
         int i = 0;
-        while(t < ft && i < 100000) {
+        while(t < ft /*&& i < 100000*/) {
 
             this.particles = beeman.integrate(particles);
 
@@ -78,7 +79,7 @@ public class Silo {
             t += dt;
             i++;
         }
-
+//        System.out.println(i);
     }
 
     private boolean addParticle() {
@@ -135,6 +136,7 @@ public class Silo {
     }
 
     private Set<Particle> removeFallenParticles(double t) {
+        int count = 0;
         Set<Particle> particles = new HashSet<>();
         for(Particle p : this.particles) {
             if(p.getPosition().getY() > (-L/10)) {
@@ -143,6 +145,7 @@ public class Silo {
                 addFallenParticles(p, particles);
                 timePrinter.appendToFile(t + "\n");
                 timePrinter.flush();
+                count++;
             }
         }
         return particles;
