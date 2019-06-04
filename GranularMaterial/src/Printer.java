@@ -77,6 +77,7 @@ public class Printer {
         }
     }
 
+
     public void appendToFile(Set<Particle> particles){
         appendToFile(generateFileString(particles));
     }

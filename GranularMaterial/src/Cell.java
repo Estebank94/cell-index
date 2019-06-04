@@ -1,7 +1,7 @@
 import java.util.HashSet;
 import java.util.Set;
 
-public class Cell {
+public class Cell extends Engine {
     private final int x;
     private final int y;
     private Set<Particle> particles;

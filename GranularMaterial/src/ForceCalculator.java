@@ -4,7 +4,7 @@ import java.util.Set;
 
 public class ForceCalculator {
     private static double g = 9.8; // m/seg^2
-    private static double Kn = Math.pow(10, 5); // N/m
+    private static double Kn = Math.pow(10, 5)*4; // N/m
     private static double Kt = 2 * Kn; // N/m
     private static double Mu = 0.1;
     private static double Gama = 70; // Kg/s
@@ -43,6 +43,7 @@ public class ForceCalculator {
 //                    double tForce = tForce(nForce, relativeVelocity(p, neighbour));
 
                     totalFn += nForce;
+
 
                     double enX = neighbour.getPosition().getX() - p.getPosition().getX();
                     double enY = neighbour.getPosition().getY() - p.getPosition().getY();
@@ -194,4 +195,3 @@ public class ForceCalculator {
     }
 
 }
-

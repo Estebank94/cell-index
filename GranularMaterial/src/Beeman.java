@@ -80,8 +80,8 @@ public class Beeman {
 
         neighbours = neighbourCalculator.getNeighbours(particles);
         for (Particle p : particles) {
-            Vector2D acceleration = forceCalculator.calculate(p, neighbours.get(p))
-                    .dividedBy(p.getMass());
+            Vector2D force = forceCalculator.calculate(p, neighbours.get(p));
+            Vector2D acceleration = force.dividedBy(p.getMass());
             p.setNextAcceleration(acceleration);
         }
     }

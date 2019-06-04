@@ -22,7 +22,6 @@ public class NeighbourCalculator {
                 grid[i][j] = new Cell(i, j);
             }
         }
-
     }
 
 

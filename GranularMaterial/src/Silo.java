@@ -51,16 +51,16 @@ public class Silo {
         System.out.println(particles.size() + " particles added.");
     }
 
-    public void run(String outPath, double ft){
+    public void run(String out, double ft){
 
         double interactionR = 0;
 
         Beeman beeman = new Beeman(new ForceCalculator(L, W, D)
             ,new NeighbourCalculator(L,W,interactionR, maxR), dt, particles);
 
-        Printer printer = new Printer(outPath, L, W, D);
-        timePrinter = new Printer(outPath + "_time", 0, 0, 0);
-        Printer energyPrinter = new Printer(outPath + "_energy", 0, 0, 0);
+        Printer printer = new Printer(out, L, W, D);
+        timePrinter = new Printer(out + "_time", 0, 0, 0);
+        Printer energyPrinter = new Printer(out + "_energy", 0, 0, 0);
 
         int i = 0;
         while(t < ft /*&& i < 100000*/) {
@@ -73,6 +73,10 @@ public class Silo {
                 printer.appendToFile(particles);
                 System.out.println("Time: " + t + "\t Iterations: " + i);
             }
+
+//            if(i == 25200){
+//                System.out.println("HOLA");
+//            }
 
             getEnergy(energyPrinter);
 
