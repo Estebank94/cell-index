@@ -69,7 +69,6 @@ public class Room {
         Beeman beeman = new Beeman(granularForce,socialForce,interactionForce,selfPropellingForce, neighbourCalculator, dt,pedestrians);
 
         Printer timePrinter = new Printer(out,L,W,D);
-        int i = 0;
         while(pedestrians.size()>0 && time < ft){
             this.pedestrians = beeman.integrate(pedestrians);
 
@@ -85,6 +84,7 @@ public class Room {
 //        System.out.println(i);
     }
 
+//
     private void addPedestrians() {
         Random r = new Random();
 

@@ -24,17 +24,17 @@ public class InteractionForce {
         this.door = door;
     }
 
-    public Vector2D calculate(Particle p, Set<Particle> neighbours) {
+    public Vector2D calculate(Particle p, Set<Particle> neighbours, Function<Particle,Vector2D> position, Function<Particle,Vector2D> speed) {
         Vector2D force = Vector2D.ZERO;
         double distance;
 
 
         for(Particle other: neighbours) {
             if(!p.equals(other)) {
-                distance = distance(p,other);
+                distance = distance(p,other,position);
 
 
-                Vector2D en = p.getPosition().subtract(other.getPosition()).versor();
+                Vector2D en = position.apply(p).subtract(position.apply(other)).versor();
                 Vector2D et = en.tangent();
 
 
@@ -42,7 +42,7 @@ public class InteractionForce {
                 double ft = 0;
                 if(distance > 0){
                     fn += granularFn(distance);
-                    ft  = granularFt(distance,relSpeed(p,other,et));
+                    ft  = granularFt(distance,relSpeed(p,other,speed,et));
                 }
 
                 force = force.add(en.multiplyBy(fn).add(et.multiplyBy(ft)));
@@ -55,13 +55,13 @@ public class InteractionForce {
 
         //TODO add wall forces
         //force = force.add(getWallForces(p,position,speed));
-        force = force.add(bottomWallForce(p));
+        force = force.add(bottomWallForce(p, position, speed));
         return force;
     }
 
 
-    private double distance(Particle i, Particle j){
-        return i.getRadius()+j.getRadius() - i.getPosition().subtract(i.getPosition()).abs();
+    private double distance(Particle i, Particle j, Function<Particle,Vector2D> position){
+        return i.getRadius()+j.getRadius() - position.apply(i).subtract(position.apply(j)).abs();
     }
 
     private double socialFn(double distance){
@@ -75,21 +75,21 @@ public class InteractionForce {
         return kt * distance * relSpeed;
     }
 
-    private double relSpeed(Particle i, Particle j, Vector2D et){
-        return j.getSpeed().subtract(i.getSpeed()).dot(et);
+    private double relSpeed(Particle i, Particle j, Function<Particle,Vector2D> speed,Vector2D et){
+        return speed.apply(j).subtract(speed.apply(i)).dot(et);
     }
 
-    private Vector2D bottomWallForce(Particle p) {
-        if(p.getPosition().x > W/2 - door/2 && p.getPosition().x < (W/2 + door/2)) {
+    private Vector2D bottomWallForce(Particle p, Function<Particle, Vector2D> position, Function<Particle, Vector2D> speed) {
+        if(position.apply(p).x > W/2 - door/2 && position.apply(p).x < (W/2 + door/2)) {
             return Vector2D.ZERO;
         }
 
-        double distance = p.getRadius() - p.getPosition().y;
+        double distance = p.getRadius() - position.apply(p).y;
 
         Vector2D en = new Vector2D(0, 1);
         Vector2D et = en.tangent();
 
-        double relSpeed = p.getSpeed().dot(et);
+        double relSpeed = speed.apply(p).dot(et);
 
         double fn = socialFn(distance);
         double ft = 0;
