@@ -42,17 +42,31 @@ public class Printer {
     }
 
     private String generateFileString(Set<Particle> particles) {
+        StringBuilder builder = new StringBuilder();
         Set<Particle> borders = new HashSet<>();
-
         addBorders(borders);
-
-        StringBuilder builder = new StringBuilder()
-                .append(particles.size() + borders.size() + "\r\n")
+        builder.append(particles.size() + borders.size() + "\r\n")
                 .append("//ID\t X\t Y\t Radius\t VX\t VY\t FN\t \r\n");
-        
+
         appendParticles(particles, builder);
         appendParticles(borders, builder);
 
+        return builder.toString();
+    }
+
+    private String generateFileString(double totalPedestriansThatEvacuated, double time) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(totalPedestriansThatEvacuated)
+                .append(" ")
+                .append(time)
+                .append("\r\n");
+        return builder.toString();
+    }
+
+    private String generateFileString(double time) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(time)
+                .append("\r\n");
         return builder.toString();
     }
 
@@ -86,6 +100,14 @@ public class Printer {
 
     public void appendToAnimation(Set<Particle> allParticles){
         appendToFile(generateFileString(allParticles));
+    }
+
+    public void appendToAnimation(double totalPedestriansThatEvacuated, double time){
+        appendToFile(generateFileString(totalPedestriansThatEvacuated, time));
+    }
+
+    public void appendToAnimation(double time){
+        appendToFile(generateFileString(time));
     }
 
 

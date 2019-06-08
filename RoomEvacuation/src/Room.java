@@ -73,9 +73,9 @@ public class Room {
             this.pedestrians = beeman.integrate(pedestrians);
 
             if(time>nextTime){
-                timePrinter.appendToAnimation(pedestrians);
                 nextTime+=jump;
                 System.out.println("Time: "+time + " | Remaining Pedestrians: " + pedestrians.size());
+                timePrinter.appendToAnimation(NUM_PEDESTRIANS - pedestrians.size(), time);
             }
             removeEvacuatedPedestrians(pedestrians);
             time+=dt;
