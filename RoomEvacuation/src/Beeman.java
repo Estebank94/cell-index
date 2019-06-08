@@ -46,7 +46,7 @@ public class Beeman {
     private void calculateAcceleration(Set<Particle> allParticles) {
         for (Particle p : allParticles) {
             Vector2D force = interactionForce.calculate(p, neighbours.get(p), Particle::getPosition, Particle::getSpeed)
-                    .add(selfPropellingForce.calculate(p,Particle::getPosition, Particle::getSpeed));
+                    .add(selfPropellingForce.calculate(p));
 
             Vector2D acceleration = force.dividedBy(p.getMass());
             p.setAcceleration(acceleration);
@@ -90,7 +90,7 @@ public class Beeman {
         for (Particle p : allParticles) {
 
             Vector2D force = interactionForce.calculate(p, neighbours.get(p), Particle::getNextPosition, Particle::getNextSpeedPredicted)
-                    .add(selfPropellingForce.calculate(p,Particle::getNextPosition, Particle::getNextSpeedPredicted));
+                    .add(selfPropellingForce.calculate(p));
             Vector2D acceleration = force.dividedBy(p.getMass());
             p.setNextAcceleration(acceleration);
         }
