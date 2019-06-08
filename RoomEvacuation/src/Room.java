@@ -11,15 +11,15 @@ public class Room {
 
 //  Simulation
     private double t, dt;
-    private final static int NUM_PEDESTRIANS = 100;
+    private final static int NUM_PEDESTRIANS = 200;
 
 //  Pedestrians
     private static double minR = 0.25; // m
     private static double maxR = 0.29; // m
     private static double mass = 80; // kg
-    private final static double maxSpeed = 0.6;
-    private final static double minSpeed = 0.6;
-
+    private final static double maxSpeed = 6;
+    private final static double minSpeed = 0.8;
+    private final static double desiredSpeed = 3;
 //  Granular Force
     private final double kn = 1.2 * Math.pow(10,5);
     private final double kt = 2 * kn;
@@ -44,13 +44,13 @@ public class Room {
         this.W = W;
         this.D = D;
         this.t = 0;
-        this.dt = 0.01 * Math.sqrt(mass/kn);
+        this.dt = Math.pow(10, -4);
         this.printingStep = printingStep;
 
         System.out.println("Dt is: " + dt);
 
         System.out.println("Adding pedestrians...");
-        addPedestrians();
+        addPedestrians(desiredSpeed);
         System.out.println(pedestrians.size() + " pedestrians added.");
     }
 
@@ -85,7 +85,7 @@ public class Room {
     }
 
 //
-    private void addPedestrians() {
+    private void addPedestrians(double desiredSpeed) {
         Random r = new Random();
 
         Vector2D target = new Vector2D(W/2, 0);
@@ -99,7 +99,7 @@ public class Room {
             double xSpeed = 0;
             double ySpeed = 0;
 
-            double desiredSpeed = r.nextDouble()*(maxSpeed-minSpeed)+maxSpeed;
+//            double desiredSpeed = r.nextDouble()*(maxSpeed-minSpeed)+maxSpeed;
 
             Particle p = new Particle(pedestrians.size(), x, y, xSpeed,ySpeed, radius, mass, desiredSpeed, target);
 
