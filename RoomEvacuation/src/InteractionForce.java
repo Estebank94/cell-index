@@ -1,9 +1,6 @@
 import java.util.Set;
 import java.util.function.Function;
 
-/**
- * Created by estebankramer on 06/06/2019.
- */
 public class InteractionForce {
 
     private final double A;
