@@ -33,6 +33,7 @@ public class Room {
 
     private double printingStep;
 
+
     // mu = 0.7
     // gama = 100 kg/s
 
@@ -54,7 +55,7 @@ public class Room {
         System.out.println(pedestrians.size() + " pedestrians added.");
     }
 
-    public void run(String out, double ft){
+    public void run(String out){
         double time=0;
         double FPS = 60;
         double jump = 1/FPS;
@@ -68,23 +69,26 @@ public class Room {
         InteractionForce interactionForce = new InteractionForce(A,B,kn,kt, W, D);
         Beeman beeman = new Beeman(granularForce,socialForce,interactionForce,selfPropellingForce, neighbourCalculator, dt,pedestrians);
 
-        Printer timePrinter = new Printer(out,L,W,D);
-        while(pedestrians.size()>0 && time < ft){
+        Printer timePrinter = new Printer(out + "_time",L,W,D);
+        Printer animationPrinter = new Printer(out + "_animation",L,W,D);
+        animationPrinter.appendToFile(NUM_PEDESTRIANS);
+        Printer outTimePrinter = new Printer(out + "_outTime", L, W, D);
+
+        while(pedestrians.size()>0 /* && time < ft */){
             this.pedestrians = beeman.integrate(pedestrians);
 
             if(time>nextTime){
+                animationPrinter.appendToFile(pedestrians);
                 nextTime+=jump;
-                System.out.println("Time: "+time + " | Remaining Pedestrians: " + pedestrians.size());
-                timePrinter.appendToAnimation(NUM_PEDESTRIANS - pedestrians.size(), time);
+                System.out.println("Time: " + time + " | Remaining Pedestrians: " + pedestrians.size());
+                timePrinter.appendToFile(NUM_PEDESTRIANS - pedestrians.size(), time);
             }
-            removeEvacuatedPedestrians(pedestrians);
+            removeEvacuatedPedestrians(pedestrians, outTimePrinter);
             time+=dt;
         }
         timePrinter.close();
-//        System.out.println(i);
     }
 
-//
     private void addPedestrians(double desiredSpeed) {
         Random r = new Random();
 
@@ -118,16 +122,18 @@ public class Room {
         return false;
     }
 
-    private int removeEvacuatedPedestrians(Set<Particle> pedestrians) {
-        int evacuted = 0;
+    private int removeEvacuatedPedestrians(Set<Particle> pedestrians, Printer outTimePrinter) {
+        int evacuated = 0;
         Set<Particle> tobeRemoved= new HashSet<>();
         for (Particle p : pedestrians){
             if(p.getPosition().x > W/2 - D/2 && p.getPosition().x < (W/2 + D/2) && p.getPosition().y<=0){
                 tobeRemoved.add(p);
-                evacuted++;
+                evacuated++;
             }
         }
+        outTimePrinter.appendToFile(evacuated + t + "\n");
+        outTimePrinter.flush();
         pedestrians.removeAll(tobeRemoved);
-        return evacuted;
+        return evacuated;
     }
 }

@@ -13,9 +13,9 @@ public class Engine {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
 
-        String martina = "/Users/martinascomazzon/Documents/2019/ITBA/Simulacion de Sistemas/Granular Material_D_" + dtf.format(now) ;
+        String martina = "/Users/martinascomazzon/Documents/2019/ITBA/Simulacion de Sistemas/RoomEvacuation/" + dtf.format(now) ;
         String esteban = "/Users/estebankramer1/Desktop/results/" + dtf.format(now);
-        room.run(esteban, 1000);
+        room.run(martina);
 
     }
 }

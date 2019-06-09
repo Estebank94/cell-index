@@ -98,15 +98,15 @@ public class Printer {
         }
     }
 
-    public void appendToAnimation(Set<Particle> allParticles){
+    public void appendToFile(Set<Particle> allParticles){
         appendToFile(generateFileString(allParticles));
     }
 
-    public void appendToAnimation(double totalPedestriansThatEvacuated, double time){
+    public void appendToFile(double totalPedestriansThatEvacuated, double time){
         appendToFile(generateFileString(totalPedestriansThatEvacuated, time));
     }
 
-    public void appendToAnimation(double time){
+    public void appendToFile(double time){
         appendToFile(generateFileString(time));
     }
 
@@ -118,5 +118,14 @@ public class Printer {
         } catch (IOException ioe2) {
             // just ignore it
         }
+    }
+
+    public void flush() {
+        try {
+            bw.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }
