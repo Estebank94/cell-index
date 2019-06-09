@@ -11,7 +11,7 @@ public class Room {
 
 //  Simulation
     private double t, dt;
-    private final static int NUM_PEDESTRIANS = 200;
+    private final static int NUM_PEDESTRIANS = 100;
 
 //  Pedestrians
     private static double minR = 0.25; // m
@@ -51,7 +51,7 @@ public class Room {
         System.out.println("Dt is: " + dt);
 
         System.out.println("Adding pedestrians...");
-        addPedestrians(desiredSpeed);
+        addPedestrians();
         System.out.println(pedestrians.size() + " pedestrians added.");
     }
 
@@ -89,7 +89,7 @@ public class Room {
         timePrinter.close();
     }
 
-    private void addPedestrians(double desiredSpeed) {
+    private void addPedestrians() {
         Random r = new Random();
 
         Vector2D target = new Vector2D(W/2, 0);
@@ -102,8 +102,6 @@ public class Room {
 
             double xSpeed = 0;
             double ySpeed = 0;
-
-//            double desiredSpeed = r.nextDouble()*(maxSpeed-minSpeed)+maxSpeed;
 
             Particle p = new Particle(pedestrians.size(), x, y, xSpeed,ySpeed, radius, mass, desiredSpeed, target);
 

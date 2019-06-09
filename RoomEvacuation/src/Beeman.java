@@ -14,7 +14,7 @@ public class Beeman {
                   SelfPropellingForce selfPropellingForce, NeighbourCalculator neighbourCalculator,
                   double dt, Set<Particle> allparticles) {
         this.granularForce = granularForce;
-        this.socialForce   = socialForce;
+        this.socialForce = socialForce;
         this.selfPropellingForce = selfPropellingForce;
         this.interactionForce = interactionForce;
         this.dt = dt;
@@ -22,7 +22,7 @@ public class Beeman {
 
         /* Intialize neighbours */
         neighbours = new HashMap<>();
-        for(Particle p : allparticles){
+        for (Particle p : allparticles) {
             neighbours.put(p, Collections.emptySet());
         }
     }
@@ -46,7 +46,7 @@ public class Beeman {
     private void calculateAcceleration(Set<Particle> allParticles) {
         for (Particle p : allParticles) {
             Vector2D force = interactionForce.calculate(p, neighbours.get(p), Particle::getPosition, Particle::getSpeed)
-                    .add(selfPropellingForce.calculate(p));
+                    .add(selfPropellingForce.calculate(p, Particle::getPosition, Particle::getSpeed));
 
             Vector2D acceleration = force.dividedBy(p.getMass());
             p.setAcceleration(acceleration);
@@ -90,7 +90,7 @@ public class Beeman {
         for (Particle p : allParticles) {
 
             Vector2D force = interactionForce.calculate(p, neighbours.get(p), Particle::getNextPosition, Particle::getNextSpeedPredicted)
-                    .add(selfPropellingForce.calculate(p));
+                    .add(selfPropellingForce.calculate(p, Particle::getNextPosition, Particle::getNextSpeedPredicted));
             Vector2D acceleration = force.dividedBy(p.getMass());
             p.setNextAcceleration(acceleration);
         }
@@ -127,6 +127,5 @@ public class Beeman {
         }
         return updatedParticles;
     }
-
-
 }
+
