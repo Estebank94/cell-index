@@ -52,8 +52,6 @@ public class InteractionForce {
         }
 
         p.setTotalFn(p.getTotalFn() + fnOnly);
-        //TODO add wall forces
-        //force = force.add(getWallForces(p,position,speed));
         force = force.add(bottomWallForce(p, position, speed));
         return force;
     }

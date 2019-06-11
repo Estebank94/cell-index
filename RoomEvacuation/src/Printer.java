@@ -116,7 +116,7 @@ public class Printer {
             bw.flush();
             bw.close();
         } catch (IOException ioe2) {
-            // just ignore it
+            // do nothing
         }
     }
 
