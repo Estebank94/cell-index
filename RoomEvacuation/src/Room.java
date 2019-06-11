@@ -19,7 +19,7 @@ public class Room {
     private static double mass = 80; // kg
     private final static double maxSpeed = 6;
     private final static double minSpeed = 0.8;
-    private final static double desiredSpeed = 3;
+    private final static double desiredSpeed = 2.5;
 //  Granular Force
     private final double kn = 1.2 * Math.pow(10,5);
     private final double kt = 2 * kn;
@@ -72,6 +72,8 @@ public class Room {
         Beeman beeman = new Beeman(granularForce,socialForce,interactionForce,selfPropellingForce, neighbourCalculator, dt,pedestrians);
 
         Printer timePrinter = new Printer(out + "_time",L,W,D);
+
+        Printer animationPrinter = new Printer(out + "_animation",L,W,D);
 //        Printer animationPrinter = new Printer(out + "_animation",L,W,D);
 //        animationPrinter.appendToFile(NUM_PEDESTRIANS);
 
@@ -79,23 +81,24 @@ public class Room {
             this.pedestrians = beeman.integrate(pedestrians);
 
             if(time>nextTime){
-//                animationPrinter.appendToFile(pedestrians);
+                animationPrinter.appendToFile(pedestrians);
                 nextTime+=jump;
                 System.out.println("Time: " + time + " | Remaining Pedestrians: " + pedestrians.size() + " Print Count:" + count);
             }
-            if(lastSize != pedestrians.size()) {
-                timePrinter.appendToFile(NUM_PEDESTRIANS - pedestrians.size(), time);
-                lastSize = pedestrians.size();
-                count++;
-            }
+//            if(lastSize != pedestrians.size()) {
+//                timePrinter.appendToFile(NUM_PEDESTRIANS - pedestrians.size(), time);
+//                lastSize = pedestrians.size();
+//                count++;
+//            }
             removeEvacuatedPedestrians(pedestrians);
             time+=dt;
         }
-        if(lastSize != pedestrians.size()) {
-            timePrinter.appendToFile(NUM_PEDESTRIANS - pedestrians.size(), time);
-            count++;
-            System.out.println("Time: " + time + " | Remaining Pedestrians: " + pedestrians.size() + " Print Count:" + count);
-        }
+//        if(lastSize != pedestrians.size()) {
+//            timePrinter.appendToFile(NUM_PEDESTRIANS - pedestrians.size(), time);
+//            count++;
+//            System.out.println("Time: " + time + " | Remaining Pedestrians: " + pedestrians.size() + " Print Count:" + count);
+//        }
+        animationPrinter.close();
         timePrinter.close();
     }
 

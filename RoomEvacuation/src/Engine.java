@@ -14,8 +14,8 @@ public class Engine {
         LocalDateTime now = LocalDateTime.now();
 
         String martina = "/Users/martinascomazzon/Documents/2019/ITBA/Simulacion de Sistemas/RoomEvacuation/" + dtf.format(now) ;
-        String esteban = "/Users/estebankramer1/Desktop/results/" + dtf.format(now);
-        room.run(martina);
+        String esteban = "/Users/estebankramer1/Desktop/results35/" + dtf.format(now);
+        room.run(esteban);
 
     }
 }

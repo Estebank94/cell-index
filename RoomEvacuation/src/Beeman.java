@@ -120,8 +120,8 @@ public class Beeman {
         Set<Particle> updatedParticles = new HashSet<>();
 
         for (Particle p : allParticles) {
-            Particle newP = new Particle(p, p.getNextPosition(), p.getNextSpeedCorrected(), p.getAcceleration());
-            newP.setTotalFn(p.getTotalFn());
+            Particle newP = new Particle(p, p.getNextPosition(), p.getNextSpeedCorrected(), p.getAcceleration(), p.getTotalFn());
+//            newP.setTotalFn(p.getTotalFn());
             updatedParticles.add(newP);
 
         }

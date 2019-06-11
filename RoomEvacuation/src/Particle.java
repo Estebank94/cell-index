@@ -41,6 +41,27 @@ public class Particle {
         this.totalFn = 0;
     }
 
+    public Particle(Particle p, Vector2D position, Vector2D speed, Vector2D previousAcc, double totalFn){
+        this.id = p.id;
+        this.mass = p.mass;
+        this.radius = p.radius;
+        this.desiredSpeed= p.desiredSpeed;
+        this.target=p.target;
+
+        this.previousAcceleration = previousAcc;
+        this.acceleration = new Vector2D();
+        this.nextAcceleration = new Vector2D();
+
+        this.position = position;
+        this.nextPosition = new Vector2D();
+
+        this.speed = speed;
+        this.nextSpeedPredicted = new Vector2D();
+        this.nextSpeedCorrected = new Vector2D();
+
+        this.totalFn = totalFn;
+    }
+
     public Particle(int id, double xPosition, double yPosition, double xSpeed, double ySpeed, double radius, double mass, double desiredSpeed, Vector2D target) {
         this.id = id;
         this.radius = radius;
@@ -183,9 +204,9 @@ public class Particle {
     }
 
     public void setTotalFn(double totalFn) {
-        if(totalFn == 0) {
+//        if(totalFn != 0) {
             this.totalFn = totalFn;
-        }
+//        }
     }
 
     public void clearFn() {

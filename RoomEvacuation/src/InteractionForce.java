@@ -24,7 +24,8 @@ public class InteractionForce {
     public Vector2D calculate(Particle p, Set<Particle> neighbours, Function<Particle,Vector2D> position, Function<Particle,Vector2D> speed) {
         Vector2D force = Vector2D.ZERO;
         double distance;
-
+        double fn = 0;
+        double fnOnly = 0;
 
         for(Particle other: neighbours) {
             if(!p.equals(other)) {
@@ -35,10 +36,11 @@ public class InteractionForce {
                 Vector2D et = en.tangent();
 
 
-                double fn = socialFn(distance);
+                fn = socialFn(distance);
                 double ft = 0;
                 if(distance > 0){
                     fn += granularFn(distance);
+                    fnOnly += granularFn(distance);
                     ft  = granularFt(distance,relSpeed(p,other,speed,et));
                 }
 
@@ -49,7 +51,7 @@ public class InteractionForce {
 
         }
 
-
+        p.setTotalFn(p.getTotalFn() + fnOnly);
         //TODO add wall forces
         //force = force.add(getWallForces(p,position,speed));
         force = force.add(bottomWallForce(p, position, speed));
@@ -90,12 +92,14 @@ public class InteractionForce {
 
         double fn = socialFn(distance);
         double ft = 0;
-
+        double fnOnly = 0;
         if(distance > 0) {
             fn += granularFn(distance);
+            fnOnly += granularFn(distance);
             ft -= granularFt(distance, relSpeed);
         }
 
+        p.setTotalFn(p.getTotalFn() + fnOnly);
         return en.multiplyBy(fn).add(et.multiplyBy(ft));
     }
 
