@@ -2,19 +2,15 @@ import java.util.*;
 
 public class Beeman {
 
-    private final SocialForce socialForce;
-    private final GranularForce granularForce;
-    private final SelfPropellingForce selfPropellingForce;
+    private final DrivingForce selfPropellingForce;
     private final InteractionForce interactionForce;
     private final double dt;
     private NeighbourCalculator neighbourCalculator;
     private Map<Particle, Set<Particle>> neighbours;
 
-    public Beeman(GranularForce granularForce, SocialForce socialForce, InteractionForce interactionForce,
-                  SelfPropellingForce selfPropellingForce, NeighbourCalculator neighbourCalculator,
+    public Beeman(InteractionForce interactionForce,
+                  DrivingForce selfPropellingForce, NeighbourCalculator neighbourCalculator,
                   double dt, Set<Particle> allparticles) {
-        this.granularForce = granularForce;
-        this.socialForce = socialForce;
         this.selfPropellingForce = selfPropellingForce;
         this.interactionForce = interactionForce;
         this.dt = dt;

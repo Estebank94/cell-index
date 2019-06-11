@@ -1,10 +1,10 @@
 import java.util.function.Function;
 
-public class SelfPropellingForce {
+public class DrivingForce {
 
     private final double tau;
 
-    public SelfPropellingForce(double tau) {
+    public DrivingForce(double tau) {
         this.tau = tau;
     }
 

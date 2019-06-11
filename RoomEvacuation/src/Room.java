@@ -11,7 +11,7 @@ public class Room {
 
 //  Simulation
     private double t, dt;
-    private final static int NUM_PEDESTRIANS = 200;
+    private final static int NUM_PEDESTRIANS = 100;
 
 //  Pedestrians
     private static double minR = 0.25; // m
@@ -65,11 +65,9 @@ public class Room {
         int count = 0;
 
         NeighbourCalculator neighbourCalculator = new NeighbourCalculator(L,W,interactionR, maxR);
-        SocialForce socialForce = new SocialForce(A,B);
-        GranularForce granularForce = new GranularForce(kn,kt);
-        SelfPropellingForce selfPropellingForce = new SelfPropellingForce(tau);
+        DrivingForce selfPropellingForce = new DrivingForce(tau);
         InteractionForce interactionForce = new InteractionForce(A,B,kn,kt, W, D);
-        Beeman beeman = new Beeman(granularForce,socialForce,interactionForce,selfPropellingForce, neighbourCalculator, dt,pedestrians);
+        Beeman beeman = new Beeman(interactionForce,selfPropellingForce, neighbourCalculator, dt,pedestrians);
 
         Printer timePrinter = new Printer(out + "_time",L,W,D);
 
