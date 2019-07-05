@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Particle {
 
     private final int id;
@@ -14,6 +17,8 @@ public class Particle {
     private final Vector2D speed;
     private Vector2D nextSpeedPredicted;
     private Vector2D nextSpeedCorrected;
+
+    private List<Vector2D> derivatives;
 
     private double totalFn;
 
@@ -34,6 +39,8 @@ public class Particle {
         this.nextSpeedCorrected = new Vector2D();
 
         this.totalFn = 0;
+
+        this.derivatives = new ArrayList<>();
     }
 
     public Particle(int id, double xPosition, double yPosition, double xSpeed, double ySpeed, double radius, double mass) {
@@ -171,6 +178,10 @@ public class Particle {
         if(totalFn != 0) {
             this.totalFn = totalFn;
         }
+    }
+
+    public List<Vector2D> getDerivatives() {
+        return derivatives;
     }
 
     public void clearFn() {
