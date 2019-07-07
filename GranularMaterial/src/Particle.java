@@ -7,10 +7,12 @@ public class Particle {
     private final double radius;
     private final double mass;
 
+    private Vector2D previousPosition;
     private final Vector2D position;
     private Vector2D nextPosition;
 
-    private final Vector2D previousAcceleration;
+
+    private Vector2D previousAcceleration;
     private Vector2D acceleration;
     private Vector2D nextAcceleration;
 
@@ -19,6 +21,8 @@ public class Particle {
     private Vector2D nextSpeedCorrected;
 
     private List<Vector2D> derivatives;
+
+    private Vector2D force;
 
     private double totalFn;
 
@@ -43,12 +47,36 @@ public class Particle {
         this.derivatives = new ArrayList<>();
     }
 
+    public Particle(Vector2D position, Vector2D prevPosition, Vector2D speed, Particle p) {
+        this.id = p.id;
+        this.mass = p.mass;
+        this.radius = p.radius;
+
+        this.previousPosition = Vector2D.ZERO;
+        this.acceleration = new Vector2D();
+        this.nextAcceleration = new Vector2D();
+
+        this.previousPosition = prevPosition;
+        this.position = position;
+        this.nextPosition = new Vector2D();
+
+        this.speed = speed;
+        this.nextSpeedPredicted = new Vector2D();
+        this.nextSpeedCorrected = new Vector2D();
+
+        this.totalFn = 0;
+
+        this.derivatives = new ArrayList<>();
+    }
+
+
+
     public Particle(int id, double xPosition, double yPosition, double xSpeed, double ySpeed, double radius, double mass) {
         this.id = id;
         this.radius = radius;
         this.mass = mass;
 
-        this.previousAcceleration = new Vector2D(0,0);
+        this.previousAcceleration = new Vector2D();
         this.acceleration = new Vector2D();
         this.nextAcceleration = new Vector2D();
 
@@ -61,12 +89,21 @@ public class Particle {
 
     }
 
+
     public int getId() {
         return id;
     }
 
     public Vector2D getPosition() {
         return position;
+    }
+
+    public Vector2D getPreviousPosition() {
+        return previousPosition;
+    }
+
+    public void setPreviousPosition(Vector2D previousPosition) {
+        this.previousPosition = previousPosition;
     }
 
     public Vector2D getSpeed() {
@@ -131,7 +168,7 @@ public class Particle {
     public void setNextSpeedCorrected(Vector2D nextVelocity){
         if(this.nextSpeedCorrected.isInitialized()){
             throw new IllegalStateException();
-        }else{
+        } else {
             this.nextSpeedCorrected = nextVelocity;
         }
     }
@@ -178,6 +215,19 @@ public class Particle {
         if(totalFn != 0) {
             this.totalFn = totalFn;
         }
+    }
+
+
+    public Vector2D getForce() {
+        return force;
+    }
+
+    public void setForce(Vector2D force) {
+        this.force = force;
+    }
+
+    public void setDerivatives(List<Vector2D> derivatives) {
+        this.derivatives = derivatives;
     }
 
     public List<Vector2D> getDerivatives() {

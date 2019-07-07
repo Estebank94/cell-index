@@ -53,6 +53,8 @@ public class Vector2D {
         return x * other.x + y * other.y;
     }
 
+    public Vector2D multipledBy(final double value) { return new Vector2D(x * value, y * value); }
+
     public double projectedOn(Vector2D other) {
         return new Vector2D(x, y).dot(other.versor());
     }
@@ -68,6 +70,7 @@ public class Vector2D {
     public boolean isInitialized() {
         return initialized;
     }
+
 
     @Override
     public String toString() {

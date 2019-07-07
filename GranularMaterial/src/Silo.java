@@ -55,8 +55,11 @@ public class Silo {
 
         double interactionR = 0;
 
-        Beeman beeman = new Beeman(new ForceCalculator(L, W, D)
-            ,new NeighbourCalculator(L,W,interactionR, maxR), dt, particles);
+//        Beeman beeman = new Beeman(new ForceCalculator(L, W, D)
+//            ,new NeighbourCalculator(L,W,interactionR, maxR), dt, particles);
+
+        Verlet verlet = new Verlet(new ForceCalculator(L, W, D)
+                ,new NeighbourCalculator(L,W,interactionR, maxR), dt, particles);
 
         Printer printer = new Printer(out, L, W, D);
         timePrinter = new Printer(out + "_time", 0, 0, 0);
@@ -65,7 +68,8 @@ public class Silo {
         int i = 0;
         while(t < ft /*&& i < 100000*/) {
 
-            this.particles = beeman.integrate(particles);
+//            this.particles = beeman.integrate(particles);
+            this.particles = verlet.integrate(particles, i == 0);
 
             this.particles = removeFallenParticles(t);
 
