@@ -8,7 +8,7 @@ public class Particle {
     private final double mass;
 
     private Vector2D previousPosition;
-    private final Vector2D position;
+    private Vector2D position;
     private Vector2D nextPosition;
 
 
@@ -16,7 +16,7 @@ public class Particle {
     private Vector2D acceleration;
     private Vector2D nextAcceleration;
 
-    private final Vector2D speed;
+    private Vector2D speed;
     private Vector2D nextSpeedPredicted;
     private Vector2D nextSpeedCorrected;
 
@@ -32,6 +32,48 @@ public class Particle {
         this.radius = p.radius;
 
         this.previousAcceleration = previousAcc;
+        this.acceleration = new Vector2D();
+        this.nextAcceleration = new Vector2D();
+
+        this.position = position;
+        this.nextPosition = new Vector2D();
+
+        this.speed = speed;
+        this.nextSpeedPredicted = new Vector2D();
+        this.nextSpeedCorrected = new Vector2D();
+
+        this.totalFn = 0;
+
+        this.derivatives = new ArrayList<>();
+    }
+
+    public Particle(Particle p, Vector2D position){
+        this.id = p.id;
+        this.mass = p.mass;
+        this.radius = p.radius;
+
+        this.previousAcceleration = new Vector2D();
+        this.acceleration = new Vector2D();
+        this.nextAcceleration = new Vector2D();
+
+        this.position = position;
+        this.nextPosition = new Vector2D();
+
+        this.speed = new Vector2D();
+        this.nextSpeedPredicted = new Vector2D();
+        this.nextSpeedCorrected = new Vector2D();
+
+        this.totalFn = 0;
+
+        this.derivatives = new ArrayList<>();
+    }
+
+    public Particle(Particle p, Vector2D position, Vector2D speed){
+        this.id = p.id;
+        this.mass = p.mass;
+        this.radius = p.radius;
+
+        this.previousAcceleration = new Vector2D();
         this.acceleration = new Vector2D();
         this.nextAcceleration = new Vector2D();
 
@@ -120,6 +162,18 @@ public class Particle {
 
     public Vector2D getPreviousAcceleration() {
         return previousAcceleration;
+    }
+
+    public void setPosition(Vector2D position) {
+        this.position = position;
+    }
+
+    public void setPreviousAcceleration(Vector2D previousAcceleration) {
+        this.previousAcceleration = previousAcceleration;
+    }
+
+    public void setSpeed(Vector2D speed) {
+        this.speed = speed;
     }
 
     public Vector2D getAcceleration() {

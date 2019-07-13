@@ -61,6 +61,9 @@ public class Silo {
         Verlet verlet = new Verlet(new ForceCalculator(L, W, D)
                 ,new NeighbourCalculator(L,W,interactionR, maxR), dt, particles);
 
+        GearPredictor gearPredictor = new GearPredictor(new ForceCalculator(L, W, D)
+                ,new NeighbourCalculator(L,W,interactionR, maxR), dt, particles);
+
         Printer printer = new Printer(out, L, W, D);
         timePrinter = new Printer(out + "_time", 0, 0, 0);
         Printer energyPrinter = new Printer(out + "_energy", 0, 0, 0);
@@ -69,8 +72,8 @@ public class Silo {
         while(t < ft /*&& i < 100000*/) {
 
 //            this.particles = beeman.integrate(particles);
-            this.particles = verlet.integrate(particles, i == 0);
-
+//            this.particles = verlet.integrate(particles, i == 0);
+            this.particles = gearPredictor.integrate(particles);
             this.particles = removeFallenParticles(t);
 
             if(i % printingStep == 0) {

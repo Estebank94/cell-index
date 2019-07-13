@@ -44,7 +44,6 @@ public class ForceCalculator {
 
                     totalFn += nForce;
 
-
                     double enX = neighbour.getPosition().getX() - p.getPosition().getX();
                     double enY = neighbour.getPosition().getY() - p.getPosition().getY();
                     double enT = Math.sqrt(Math.pow(enX,2) + Math.pow(enY,2));
@@ -66,6 +65,7 @@ public class ForceCalculator {
     }
 
 
+
     private double nForce(double overlap, double dOverlap) {
         return -Kn * overlap - Gama * dOverlap;
     }
@@ -74,7 +74,7 @@ public class ForceCalculator {
         return - Mu * Math.abs(nForce) * Math.signum(vr);
     }
 
-    private double overlapping(Particle i, Particle j){
+    public double overlapping(Particle i, Particle j){
 
         double resultX = Math.abs(i.getPosition().getX() - j.getPosition().getX());
         double resultY = Math.abs(i.getPosition().getY() - j.getPosition().getY());
@@ -89,7 +89,8 @@ public class ForceCalculator {
 
     }
 
-    private double overlappingDerivation(Particle i, Particle j){
+
+    public double overlappingDerivation(Particle i, Particle j){
         double directionX = j.getPosition().getX() - i.getPosition().getX();
         double directionY = j.getPosition().getY() - i.getPosition().getY();
         Vector2D direction = new Vector2D(directionX, directionY);
@@ -101,6 +102,7 @@ public class ForceCalculator {
         }
         return 0;
     }
+
 
     private double relativeVelocity(Particle i, Particle j) {
         double directionX = j.getPosition().getX() - i.getPosition().getX();
@@ -194,4 +196,11 @@ public class ForceCalculator {
         return force;
     }
 
+    public static double getKn() {
+        return Kn;
+    }
+
+    public static double getGama() {
+        return Gama;
+    }
 }
