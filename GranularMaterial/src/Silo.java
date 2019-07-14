@@ -29,7 +29,7 @@ public class Silo {
         this.W = W;
         this.D = D;
         this.t = 0;
-        this.dt = Math.pow(10,-6);
+        this.dt = Math.pow(10,-5);
 //        this.dt = 0.1 * Math.sqrt(mass/Math.pow(10, 5));
         this.printingStep = printingStep;
 
@@ -38,7 +38,7 @@ public class Silo {
         System.out.println("Adding particles...");
         int i = 0;
         int tries = 0;
-        while(i < 100  /*|| tries < MAX_TRIES*/) {
+        while(i < 500  /*|| tries < MAX_TRIES*/) {
             if(addParticle()) {
                 i++;
                 System.out.println(i);
@@ -73,7 +73,7 @@ public class Silo {
 
 //            this.particles = beeman.integrate(particles);
 //            this.particles = verlet.integrate(particles, i == 0);
-            this.particles = gearPredictor.integrate(particles);
+            this.particles = gearPredictor.integrate(particles, i);
 //            this.particles = removeFallenParticles(t);
 
             if(i % printingStep == 0) {
