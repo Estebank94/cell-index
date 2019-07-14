@@ -26,9 +26,11 @@ public class GearPredictor {
      */
     public Set<Particle> integrate(Set<Particle> particles) {
 
-        calculateAcceleration(particles);
+//        calculateNextAcceleration(particles);
 
-        calculateNextAcceleration(particles);
+        neighbours = neighbourCalculator.getNeighbours(particles);
+
+//        calculateAcceleration(particles);
 
         updateParticles(particles);
 
@@ -43,7 +45,8 @@ public class GearPredictor {
         for(Particle p1 : particles) {
             Vector2D r0 = p1.getPosition();
             Vector2D r1 = p1.getSpeed();
-            Vector2D r2 = p1.getAcceleration();
+            Vector2D force = forceCalculator.calculate(p1, neighbours.get(p1));
+            Vector2D r2 = force.dividedBy(p1.getMass());
             Vector2D r3 = (r1.multipledBy(kn).add(r2.multipledBy(gamma))).dividedBy(p1.getMass());
             Vector2D r4 = (r2.multipledBy(kn).add(r3.multipledBy(gamma))).dividedBy(p1.getMass());
             Vector2D r5 = (r3.multipledBy(kn).add(r4.multipledBy(gamma))).dividedBy(p1.getMass());
@@ -53,12 +56,14 @@ public class GearPredictor {
             Vector2D rp2 = r2.add(r3.multipledBy(dt)).add(r4.multipledBy((dt*dt)/2)).add(r5.multipledBy((dt*dt*dt)/6));
 
             Particle aux = new Particle(p1, rp0, rp1);
-            Vector2D nextAcceleration = forceCalculator.calculate(aux, neighbours.get(p1)).dividedBy(aux.getMass());
-            Vector2D deltaA = nextAcceleration.subtract(rp2);
-            Vector2D deltar2 = deltaA.multipledBy((dt*dt)/2);
+            Vector2D force1 = forceCalculator.calculate(aux, neighbours.get(p1));
+            Vector2D nextAcceleration = force1.dividedBy(aux.getMass());
 
-            Vector2D rc0 = rp0.add(deltar2.multipledBy(3.0/16));
-            Vector2D rc1 = rp1.add(deltar2.multipledBy(251.0/(360*dt)));
+            Vector2D deltaA = nextAcceleration.subtract(rp2);
+            Vector2D delta2 = deltaA.multipledBy((dt*dt)/2);
+
+            Vector2D rc0 = rp0.add(delta2.multipledBy(3.0/16));
+            Vector2D rc1 = rp1.add(delta2.multipledBy(251.0/(360*dt)));
 
             p1.setPosition(rc0);
             p1.setSpeed(rc1);
@@ -78,7 +83,7 @@ public class GearPredictor {
         for (Particle p : particles) {
             Vector2D force = forceCalculator.calculate(p, neighbours.get(p));
             Vector2D acceleration = force.dividedBy(p.getMass());
-            p.setNextAcceleration(acceleration);
+            p.setAcceleration(acceleration);
         }
     }
 
@@ -88,7 +93,6 @@ public class GearPredictor {
 
         for (Particle p : particles) {
             Particle newP = new Particle (p, p.getPosition(), p.getSpeed());
-            newP.setTotalFn(0);
             updatedParticles.add(newP);
         }
         return updatedParticles;

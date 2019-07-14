@@ -4,13 +4,12 @@ import java.util.Set;
 
 public class ForceCalculator {
     private static double g = 9.8; // m/seg^2
-    private static double Kn = Math.pow(10, 5)*4; // N/m
+    private static double Kn = Math.pow(10, 5); // N/m
     private static double Kt = 2 * Kn; // N/m
     private static double Mu = 0.1;
     private static double Gama = 70; // Kg/s
 
     private double L, W, D;
-
 
 
     public ForceCalculator(double L, double W, double D) {
@@ -40,6 +39,7 @@ public class ForceCalculator {
                 d = overlappingDerivation(p, neighbour);
                 if(overlap > 0){
                     double nForce = nForce(overlap, d);
+//                    double nForce = -Kn * overlap;
 //                    double tForce = tForce(nForce, relativeVelocity(p, neighbour));
 
                     totalFn += nForce;
@@ -48,10 +48,15 @@ public class ForceCalculator {
                     double enY = neighbour.getPosition().getY() - p.getPosition().getY();
                     double enT = Math.sqrt(Math.pow(enX,2) + Math.pow(enY,2));
 
+                    Vector2D relativeVelocity = p.getSpeed().subtract(neighbour.getSpeed());
+                    Vector2D tangentVector = new Vector2D(-enY, enX);
+                    double tForce = -Kt * overlap * (relativeVelocity.dot(tangentVector));
+
+
                     Vector2D enV = new Vector2D(enX, enY);
                     Vector2D en = enV.dividedBy(enT);
 
-                    Vector2D newForce = new Vector2D(nForce * en.x /*- tForce * en.y*/,nForce * en.y /*+ tForce * en.x*/);
+                    Vector2D newForce = new Vector2D(nForce * en.x - tForce * en.y,nForce * en.y + tForce * en.x);
 
                     force = force.add(newForce);
                 }
@@ -154,7 +159,12 @@ public class ForceCalculator {
         fn = nForce(overlap, dervOver);
 //        ft = tForce(fn, p.getSpeed().projectedOn(new Vector2D(1,0)));
 
-        Vector2D force = new Vector2D(fn * enx /*- ft * eny*/, fn * eny /*+ ft * enx*/);
+        Vector2D relativeVelocity = p.getSpeed().subtract(Vector2D.ZERO);
+        Vector2D tangentVector = new Vector2D(-eny, enx);
+        ft  = -Kt * overlap * (relativeVelocity.dot(tangentVector));
+
+
+        Vector2D force = new Vector2D(fn * enx - ft * eny, fn * eny + ft * enx);
         return force;
     }
 
@@ -171,7 +181,12 @@ public class ForceCalculator {
 
         fn = nForce(overlap,dervOver);
 //        ft = tForce(fn, p.getSpeed().projectedOn(new Vector2D(0,1)));
-        Vector2D force = new Vector2D(fn * enx /*- ft * eny*/, fn * eny /*+ ft * enx*/);
+
+        Vector2D relativeVelocity = p.getSpeed().subtract(Vector2D.ZERO);
+        Vector2D tangentVector = new Vector2D(-eny, enx);
+        ft  = -Kt * overlap * (relativeVelocity.dot(tangentVector));
+
+        Vector2D force = new Vector2D(fn * enx - ft * eny, fn * eny + ft * enx);
         return force;
     }
 
@@ -191,8 +206,11 @@ public class ForceCalculator {
 
         fn = nForce(overlap,dervOver);
 //        ft = tForce(fn, p.getSpeed().projectedOn(new Vector2D(0,1)));
+        Vector2D relativeVelocity = p.getSpeed().subtract(Vector2D.ZERO);
+        Vector2D tangentVector = new Vector2D(-eny, enx);
+        ft  = -Kt * overlap * (relativeVelocity.dot(tangentVector));
 
-        Vector2D force = new Vector2D(fn * enx /*- ft * eny*/, fn * eny /*+ ft * enx*/);
+        Vector2D force = new Vector2D(fn * enx - ft * eny, fn * eny + ft * enx);
         return force;
     }
 

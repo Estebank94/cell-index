@@ -29,7 +29,7 @@ public class Silo {
         this.W = W;
         this.D = D;
         this.t = 0;
-        this.dt = Math.pow(10,-5);
+        this.dt = Math.pow(10,-6);
 //        this.dt = 0.1 * Math.sqrt(mass/Math.pow(10, 5));
         this.printingStep = printingStep;
 
@@ -38,7 +38,7 @@ public class Silo {
         System.out.println("Adding particles...");
         int i = 0;
         int tries = 0;
-        while(i < 500 || tries < MAX_TRIES) {
+        while(i < 100  /*|| tries < MAX_TRIES*/) {
             if(addParticle()) {
                 i++;
                 System.out.println(i);
@@ -53,10 +53,10 @@ public class Silo {
 
     public void run(String out, double ft){
 
-        double interactionR = 0;
+        double interactionR = 0.015;
 
-//        Beeman beeman = new Beeman(new ForceCalculator(L, W, D)
-//            ,new NeighbourCalculator(L,W,interactionR, maxR), dt, particles);
+        Beeman beeman = new Beeman(new ForceCalculator(L, W, D)
+            ,new NeighbourCalculator(L,W,interactionR, maxR), dt, particles);
 
         Verlet verlet = new Verlet(new ForceCalculator(L, W, D)
                 ,new NeighbourCalculator(L,W,interactionR, maxR), dt, particles);
@@ -74,23 +74,19 @@ public class Silo {
 //            this.particles = beeman.integrate(particles);
 //            this.particles = verlet.integrate(particles, i == 0);
             this.particles = gearPredictor.integrate(particles);
-            this.particles = removeFallenParticles(t);
+//            this.particles = removeFallenParticles(t);
 
             if(i % printingStep == 0) {
                 printer.appendToFile(particles);
-                System.out.println("Time: " + t + "\t Iterations: " + i);
+//                System.out.println("Time: " + t + "\t Iterations: " + i);
             }
 
-//            if(i == 25200){
-//                System.out.println("HOLA");
-//            }
-
+            System.out.println("time: " + t);
             getEnergy(energyPrinter);
 
             t += dt;
             i++;
         }
-//        System.out.println(i);
     }
 
     private boolean addParticle() {
@@ -167,6 +163,8 @@ public class Silo {
         for(Particle p : particles) {
             speed += Math.pow(p.getSpeed().abs(), 2);
         }
+
+        System.out.println(speed);
 
         double energy = 0.5 * mass * speed;
 
